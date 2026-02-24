@@ -577,6 +577,13 @@ function TikTokIcon({ size = 20, color = 'currentColor' }) {
   );
 }
 
+// ── Analytics helpers ─────────────────────────────────────────────────────────
+// Fires an event to both GA4 and Umami safely
+function trackEvent(name, params = {}) {
+  try { window.gtag?.('event', name, params); } catch (e) {}
+  try { window.umami?.track(name, params); } catch (e) {}
+}
+
 // ── Main App ──────────────────────────────────────────────────────────────────
 const StudyCafe = () => {
   const [selectedBuddy, setSelectedBuddy] = useState(null);
@@ -600,6 +607,77 @@ const StudyCafe = () => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isTimerMinimized, setIsTimerMinimized] = useState(false);
   const timerRef = useRef(null);
+
+  // ── Analytics: track time spent on page ──────────────────────────────────────
+  // We keep our own elapsed-seconds counter using setInterval so it is completely
+  // immune to the YouTube iframe stealing window focus (the root cause of 0-2s).
+  const sessionStartRef = useRef(Date.now());
+  const activeSecondsRef = useRef(0);
+  const analyticsIntervalRef = useRef(null);
+
+  // Start the counter as soon as the app mounts and keep it alive regardless of
+  // focus state.  Every 30 s we push a heartbeat so GA4/Umami see ongoing
+  // engagement, and on unload we send the final elapsed time.
+  useEffect(() => {
+    sessionStartRef.current = Date.now();
+    activeSecondsRef.current = 0;
+
+    // Tick every second — not affected by iframe focus
+    const tick = setInterval(() => {
+      activeSecondsRef.current += 1;
+
+      // Every 30 s fire a heartbeat ping so analytics mark the session as engaged
+      if (activeSecondsRef.current % 30 === 0) {
+        trackEvent('heartbeat', {
+          active_seconds: activeSecondsRef.current,
+          page: selectedBuddy ? 'study_room' : 'landing',
+          buddy: selectedBuddy?.name ?? 'none',
+        });
+      }
+    }, 1000);
+
+    analyticsIntervalRef.current = tick;
+
+    // On tab close / navigation send final duration
+    const handleUnload = () => {
+      trackEvent('session_duration', {
+        seconds: activeSecondsRef.current,
+        page: selectedBuddy ? 'study_room' : 'landing',
+        buddy: selectedBuddy?.name ?? 'none',
+      });
+    };
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      clearInterval(tick);
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Reclaim focus from YouTube iframes so the browser never thinks the user left
+  useEffect(() => {
+    const reclaim = () => { setTimeout(() => { try { window.focus(); } catch (e) {} }, 50); };
+    window.addEventListener('blur', reclaim);
+    return () => window.removeEventListener('blur', reclaim);
+  }, []);
+
+  // Track buddy selection
+  useEffect(() => {
+    if (!selectedBuddy) return;
+    trackEvent('select_buddy', { buddy: selectedBuddy.name, group: selectedBuddy.group });
+  }, [selectedBuddy?.id]);
+
+  // Track timer start/stop
+  useEffect(() => {
+    if (isRunning) {
+      trackEvent('timer_start', { type: isStudying ? 'study' : 'break', buddy: selectedBuddy?.name ?? 'none' });
+    }
+  }, [isRunning]);
+
+  // Track music change
+  const selectedMusicRef = useRef(null);
+  // (used below inside the music handler)
 
   const cafeItems = [
     { id: 1, name: 'Coffee Steam', emoji: '☕' },
@@ -1147,7 +1225,10 @@ const StudyCafe = () => {
                 </div>
                 <div className="music-scroll space-y-1.5" style={{ maxHeight: '240px', overflowY: 'auto', paddingRight: '4px' }}>
                   {musicOptions.map(music => (
-                    <button key={music.id} onClick={() => setSelectedMusic(music)}
+                    <button key={music.id} onClick={() => {
+                      setSelectedMusic(music);
+                      trackEvent('music_changed', { track: music.name, buddy: selectedBuddy?.name ?? 'none' });
+                    }}
                       className={`w-full p-2 rounded-xl transition-all transform hover:scale-105 text-left ${selectedMusic.id === music.id ? 'text-white shadow-lg' : 'bg-white hover:bg-pink-50'}`}
                       style={selectedMusic.id === music.id ? { background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' } : {}}>
                       <div className="flex items-center gap-2">
