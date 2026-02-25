@@ -626,8 +626,8 @@ const StudyCafe = () => {
     const tick = setInterval(() => {
       activeSecondsRef.current += 1;
 
-      // Every 30 s fire a heartbeat ping so analytics mark the session as engaged
-      if (activeSecondsRef.current % 30 === 0) {
+      // Every 2 s fire a heartbeat ping so analytics mark the session as engaged
+      if (activeSecondsRef.current % 2 === 0) {
         trackEvent('heartbeat', {
           active_seconds: activeSecondsRef.current,
           page: selectedBuddy ? 'study_room' : 'landing',
