@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Coffee, Music, Volume2, VolumeX, Settings, Crown, Star, Flame, Users, ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Heart, Sparkles, Award, Gift, Headphones, Clock, BarChart3, ChevronUp, Minimize2, Maximize2, CheckSquare, Square, Plus, Trash2, X } from 'lucide-react';
+import { Coffee, Music, Volume2, VolumeX, Settings, Crown, Star, Flame, Users, ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Heart, Sparkles, Award, Gift, Headphones, Clock, BarChart3, ChevronUp, ChevronDown, Minimize2, Maximize2, CheckSquare, Square, Plus, Trash2, X } from 'lucide-react';
 
 const fontStyle = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
@@ -60,6 +60,14 @@ const fontStyle = `
   }
   .todo-slide-in {
     animation: todoSlideIn 0.25s cubic-bezier(0.34,1.2,0.64,1) forwards;
+  }
+
+  @keyframes menuBarSlideIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.96); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  }
+  .menu-bar-slide-in {
+    animation: menuBarSlideIn 0.3s cubic-bezier(0.34,1.2,0.64,1) forwards;
   }
 
   .music-scroll::-webkit-scrollbar {
@@ -578,7 +586,6 @@ function TikTokIcon({ size = 20, color = 'currentColor' }) {
 }
 
 // ── Analytics helpers ─────────────────────────────────────────────────────────
-// Fires an event to both GA4 and Umami safely
 function trackEvent(name, params = {}) {
   try { window.gtag?.('event', name, params); } catch (e) {}
   try { window.umami?.track(name, params); } catch (e) {}
@@ -606,56 +613,69 @@ const StudyCafe = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isTimerMinimized, setIsTimerMinimized] = useState(false);
+  // ── NEW: bottom menu bar minimized state ──────────────────────────────────
+  const [isMenuBarMinimized, setIsMenuBarMinimized] = useState(false);
   const timerRef = useRef(null);
 
   // ── Analytics: track time spent on page ──────────────────────────────────────
-  // We keep our own elapsed-seconds counter using setInterval so it is completely
-  // immune to the YouTube iframe stealing window focus (the root cause of 0-2s).
   const sessionStartRef = useRef(Date.now());
-  const activeSecondsRef = useRef(0);
-  const analyticsIntervalRef = useRef(null);
+  const selectedBuddyRef = useRef(null);
 
-  // Start the counter as soon as the app mounts and keep it alive regardless of
-  // focus state.  Every 30 s we push a heartbeat so GA4/Umami see ongoing
-  // engagement, and on unload we send the final elapsed time.
+  useEffect(() => {
+    selectedBuddyRef.current = selectedBuddy;
+  }, [selectedBuddy]);
+
   useEffect(() => {
     sessionStartRef.current = Date.now();
-    activeSecondsRef.current = 0;
 
-    // Tick every second — not affected by iframe focus
-    const tick = setInterval(() => {
-      activeSecondsRef.current += 1;
+    const getElapsed = () => Math.floor((Date.now() - sessionStartRef.current) / 1000);
+    const getPage = () => selectedBuddyRef.current ? 'study_room' : 'landing';
+    const getBuddy = () => selectedBuddyRef.current?.name ?? 'none';
 
-      // Every 2 s fire a heartbeat ping so analytics mark the session as engaged
-      if (activeSecondsRef.current % 2 === 0) {
+    let heartbeatTimeout;
+    const scheduleHeartbeat = () => {
+      heartbeatTimeout = setTimeout(() => {
         trackEvent('heartbeat', {
-          active_seconds: activeSecondsRef.current,
-          page: selectedBuddy ? 'study_room' : 'landing',
-          buddy: selectedBuddy?.name ?? 'none',
+          active_seconds: getElapsed(),
+          page: getPage(),
+          buddy: getBuddy(),
         });
+        scheduleHeartbeat();
+      }, 30000);
+    };
+    scheduleHeartbeat();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        trackEvent('heartbeat', {
+          active_seconds: getElapsed(),
+          page: getPage(),
+          buddy: getBuddy(),
+        });
+        clearTimeout(heartbeatTimeout);
+        scheduleHeartbeat();
       }
-    }, 1000);
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
-    analyticsIntervalRef.current = tick;
-
-    // On tab close / navigation send final duration
     const handleUnload = () => {
       trackEvent('session_duration', {
-        seconds: activeSecondsRef.current,
-        page: selectedBuddy ? 'study_room' : 'landing',
-        buddy: selectedBuddy?.name ?? 'none',
+        seconds: getElapsed(),
+        page: getPage(),
+        buddy: getBuddy(),
       });
     };
     window.addEventListener('beforeunload', handleUnload);
 
     return () => {
-      clearInterval(tick);
+      clearTimeout(heartbeatTimeout);
+      document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('beforeunload', handleUnload);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reclaim focus from YouTube iframes so the browser never thinks the user left
+  // Reclaim focus from YouTube iframes
   useEffect(() => {
     const reclaim = () => { setTimeout(() => { try { window.focus(); } catch (e) {} }, 50); };
     window.addEventListener('blur', reclaim);
@@ -675,9 +695,7 @@ const StudyCafe = () => {
     }
   }, [isRunning]);
 
-  // Track music change
   const selectedMusicRef = useRef(null);
-  // (used below inside the music handler)
 
   const cafeItems = [
     { id: 1, name: 'Coffee Steam', emoji: '☕' },
@@ -720,9 +738,10 @@ const StudyCafe = () => {
     { id: 29, name: 'Hyunjin',      group: 'Stray Kids',  videoId: 'QFfZlBdAhgs?si=dYxdJAq3oc4V6R4J', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Hyunjin_of_Stray_Kids%2C_September_24%2C_2025.png' },
     { id: 32, name: 'Yunah',        group: 'ILLIT',       videoId: 'Kz5ie0SAPJM?si=VfoZlZkZ1t2Blwoc', isPremium: false, image: 'https://www.billboard.com/wp-content/uploads/2024/06/ILLIT-Rookie-Spotlight-YUNAH-billboard-1240.jpg?w=800' },
     { id: 33, name: 'Chuu',         group: 'LOONA',       videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/20251002_Chuu_%EC%B8%84_03.jpg/250px-20251002_Chuu_%EC%B8%84_03.jpg' },
+    { id: 34, name: 'Yuna',         group: 'ITZY',       videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_', isPremium: false, image: 'https://pbs.twimg.com/media/E6OrSSsWYAE-Naw.jpg' },
   ];
 
-  const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA'];
+  const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA', 'ITZY'];
 
   const showToast = (message, emoji, subtext) => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
@@ -749,10 +768,26 @@ const StudyCafe = () => {
             setPlayTimerSound(true);
             setIsMusicPaused(true);
             if (isStudying) {
+              // ── NEW: track study session completion event ──
+              trackEvent('timer_complete', {
+                type: 'study',
+                duration_minutes: 25,
+                buddy: selectedBuddy?.name ?? 'none',
+                group: selectedBuddy?.group ?? 'none',
+                music: selectedMusic?.name ?? 'none',
+              });
               fireBrowserNotification('Study Session Complete! 🎉', 'Great job! Time for a café break ☕');
               setTimerDoneNotif({ visible: true, wasStudying: true });
               setTimerMinutes(5); setTimerSeconds(0); setIsStudying(false);
             } else {
+              // ── NEW: track break session completion event ──
+              trackEvent('timer_complete', {
+                type: 'break',
+                duration_minutes: 5,
+                buddy: selectedBuddy?.name ?? 'none',
+                group: selectedBuddy?.group ?? 'none',
+                music: selectedMusic?.name ?? 'none',
+              });
               fireBrowserNotification("Break Time Over!", "Ready to study again? Let's go! 📚");
               setTimerDoneNotif({ visible: true, wasStudying: false });
               setTimerMinutes(25); setTimerSeconds(0); setIsStudying(true);
@@ -814,7 +849,6 @@ const StudyCafe = () => {
           <div className="absolute bottom-40 right-20 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '1.2s', animationDuration: '3.7s' }}>🎀</div>
           <Heart className="absolute top-60 left-40 w-6 h-6 text-rose-300 opacity-40 animate-pulse" style={{ animationDelay: '2s' }} />
 
-          {/* Main content */}
           <div className="flex-1 max-w-7xl mx-auto px-8 py-6 w-full">
             {/* ── NAVBAR ── */}
             <div className="flex items-center justify-between mb-12">
@@ -829,7 +863,6 @@ const StudyCafe = () => {
                 </div>
               </div>
 
-              {/* ── RIGHT SIDE: TikTok link ── */}
               <a
                 href="https://www.tiktok.com/@idore.collections"
                 target="_blank"
@@ -932,7 +965,6 @@ const StudyCafe = () => {
             zIndex: 10,
           }}>
             <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-              {/* Brand */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ position: 'relative' }}>
                   <Coffee style={{ width: 22, height: 22, color: '#FF6B9D' }} />
@@ -943,7 +975,6 @@ const StudyCafe = () => {
                 </span>
               </div>
 
-              {/* Center tagline */}
               <div style={{ textAlign: 'center', flex: 1 }}>
                 <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '14px', color: '#B8A0CC', fontWeight: 300 }}>
                   Study harder, dream bigger, stan forever ✨
@@ -955,7 +986,6 @@ const StudyCafe = () => {
                 </div>
               </div>
 
-              {/* Right: Contact only (mailto) */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                 <a
                   href="mailto:idore.collections@gmail.com"
@@ -999,7 +1029,6 @@ const StudyCafe = () => {
           onDismiss={handleTimerNotifDismiss}
         />
 
-        {/* Web Audio alarm */}
         <TimerSound
           shouldPlay={playTimerSound}
           onDone={() => setPlayTimerSound(false)}
@@ -1214,9 +1243,11 @@ const StudyCafe = () => {
           {/* To-Do Widget — fixed bottom-right */}
           <TodoWidget />
 
-          {/* Bottom Menu */}
+          {/* ── Bottom Menu ── */}
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-            {showMusicMenu && (
+
+            {/* Music dropdown — only when bar is not minimized */}
+            {!isMenuBarMinimized && showMusicMenu && (
               <div className="mb-4 rounded-3xl shadow-2xl backdrop-blur-xl border-3 p-4"
                 style={{ background: 'linear-gradient(135deg, rgba(255,245,247,0.98), rgba(245,243,255,0.98))', borderColor: 'rgba(255,107,157,0.3)', minWidth: '280px', maxWidth: '300px' }}>
                 <div className="flex items-center gap-2 mb-3">
@@ -1242,7 +1273,8 @@ const StudyCafe = () => {
               </div>
             )}
 
-            {showCafeMenu && (
+            {/* Café dropdown — only when bar is not minimized */}
+            {!isMenuBarMinimized && showCafeMenu && (
               <div className="mb-4 rounded-3xl shadow-2xl backdrop-blur-xl border-3 p-6"
                 style={{ background: 'linear-gradient(135deg, rgba(255,248,230,0.98), rgba(255,243,220,0.98))', borderColor: 'rgba(255,165,0,0.25)', minWidth: '300px' }}>
                 <div className="flex items-center gap-2 mb-4">
@@ -1264,45 +1296,83 @@ const StudyCafe = () => {
               </div>
             )}
 
-            {/* Bottom bar */}
-            <div className="flex items-center gap-4 px-8 py-5 rounded-full shadow-2xl backdrop-blur-xl border-3"
-              style={{ background: 'linear-gradient(135deg, rgba(255,107,157,0.95), rgba(200,109,215,0.95))', borderColor: 'rgba(255,255,255,0.3)' }}>
-
-              {/* Mute toggle — properly toggles isMuted state */}
-              <button onClick={() => setIsMuted(m => !m)} className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30">
-                {isMuted ? <VolumeX className="w-6 h-6 text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
-              </button>
-
-              {/* Play/Pause music */}
-              <button
-                onClick={() => setIsMusicPaused(p => !p)}
-                className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30"
-                title={isMusicPaused ? 'Resume music' : 'Pause music'}
+            {/* ── Main bottom bar ── */}
+            {isMenuBarMinimized ? (
+              /* ── Minimized pill: just shows current track name + expand button ── */
+              <div
+                className="menu-bar-slide-in flex items-center gap-3 px-5 py-3 rounded-full shadow-2xl backdrop-blur-xl border-3"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,107,157,0.95), rgba(200,109,215,0.95))',
+                  borderColor: 'rgba(255,255,255,0.3)',
+                }}
               >
-                {isMusicPaused
-                  ? <Play className="w-6 h-6 text-white" fill="white" />
-                  : <Pause className="w-6 h-6 text-white" fill="white" />
-                }
-              </button>
+                <Music className="w-4 h-4 text-white opacity-80" />
+                <span className="text-white font-bold text-sm opacity-90">{selectedMusic.icon} {selectedMusic.name}</span>
+                <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.3)', margin: '0 2px' }} />
+                <button
+                  onClick={() => setIsMenuBarMinimized(false)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all transform hover:scale-105 bg-white/20 hover:bg-white/35"
+                  title="Expand controls"
+                >
+                  <ChevronUp className="w-4 h-4 text-white" />
+                  <span className="text-white text-xs font-bold">Show</span>
+                </button>
+              </div>
+            ) : (
+              /* ── Full expanded bar ── */
+              <div
+                className="flex items-center gap-4 px-9 py-5 rounded-full shadow-2xl backdrop-blur-xl border-3"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,107,157,0.95), rgba(200,109,215,0.95))',
+                  borderColor: 'rgba(255,255,255,0.3)',
+                }}
+              >
+                {/* Mute toggle */}
+                <button onClick={() => setIsMuted(m => !m)} className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30">
+                  {isMuted ? <VolumeX className="w-6 h-6 text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
+                </button>
 
-              {/* Music Vibes */}
-              <button
-                onClick={() => { setShowMusicMenu(s => !s); setShowCafeMenu(false); }}
-                className={`flex items-center gap-3 px-6 py-3 rounded-full transition transform hover:scale-105 ${showMusicMenu ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}>
-                <Music className="w-5 h-5 text-white" />
-                <span className="text-white font-bold text-sm">{selectedMusic.name}</span>
-                <ChevronUp className={`w-4 h-4 text-white transition-transform duration-200 ${showMusicMenu ? 'rotate-180' : ''}`} />
-              </button>
+                {/* Play/Pause music */}
+                <button
+                  onClick={() => setIsMusicPaused(p => !p)}
+                  className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30"
+                  title={isMusicPaused ? 'Resume music' : 'Pause music'}
+                >
+                  {isMusicPaused
+                    ? <Play className="w-6 h-6 text-white" fill="white" />
+                    : <Pause className="w-6 h-6 text-white" fill="white" />
+                  }
+                </button>
 
-              {/* Café Vibes */}
-              <button
-                onClick={() => { setShowCafeMenu(s => !s); setShowMusicMenu(false); }}
-                className={`flex items-center gap-3 px-6 py-3 rounded-full transition transform hover:scale-105 ${showCafeMenu ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}>
-                <Coffee className="w-5 h-5 text-white" />
-                <span className="text-white font-bold text-sm">Café Vibes</span>
-                <ChevronUp className={`w-4 h-4 text-white transition-transform duration-200 ${showCafeMenu ? 'rotate-180' : ''}`} />
-              </button>
-            </div>
+                {/* Music Vibes */}
+                <button
+                  onClick={() => { setShowMusicMenu(s => !s); setShowCafeMenu(false); }}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-full transition transform hover:scale-105 ${showMusicMenu ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}>
+                  <Music className="w-5 h-5 text-white" />
+                  <span className="text-white font-bold text-sm">{selectedMusic.name}</span>
+                  <ChevronUp className={`w-4 h-4 text-white transition-transform duration-200 ${showMusicMenu ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Café Vibes */}
+                <button
+                  onClick={() => { setShowCafeMenu(s => !s); setShowMusicMenu(false); }}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-full transition transform hover:scale-105 ${showCafeMenu ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}>
+                  <Coffee className="w-5 h-5 text-white" />
+                  <span className="text-white font-bold text-sm">Café Vibes</span>
+                  <ChevronUp className={`w-4 h-4 text-white transition-transform duration-200 ${showCafeMenu ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* ── NEW: Minimize button ── */}
+                <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.25)', margin: '0 2px' }} />
+                <button
+                  onClick={() => { setIsMenuBarMinimized(true); setShowMusicMenu(false); setShowCafeMenu(false); }}
+                  className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30"
+                  title="Minimize controls"
+                >
+                  <ChevronDown className="w-5 h-5 text-white" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
