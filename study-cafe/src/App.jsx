@@ -695,14 +695,13 @@ function trackEvent(name, params = {}) {
   try { window.umami?.track(name, params); } catch (e) {}
 }
 
-// ── useIsMobile hook ──────────────────────────────────────────────────────────
+// ── useIsMobile hook — stable, no re-render on resize to avoid killing YT iframe ──
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
-  useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
+  // Read once at mount time only — resize doesn't matter for our use case
+  // and re-renders caused by resize would remount the YT iframe killing autoplay
+  const [isMobile] = useState(() => {
+    try { return window.innerWidth <= 768; } catch(e) { return false; }
+  });
   return isMobile;
 }
 
@@ -1221,7 +1220,7 @@ const StudyCafe = () => {
         )}
 
         {/* Main Content */}
-        <div className="flex-1 relative h-screen overflow-hidden">
+        <div className="flex-1 relative h-screen overflow-hidden" style={{ minHeight: '100vh' }}>
 
           {activeCafeItems.map((itemId, index) => {
             const item = cafeItems.find(i => i.id === itemId);
