@@ -216,7 +216,7 @@ function YTBackground({ videoId }) {
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#000' }}>
       <iframe
         width="100%" height="100%"
-        src={`https://www.youtube.com/embed/${cleanVideoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanVideoId}&rel=0&modestbranding=1&showinfo=0`}
+        src={`https://www.youtube.com/embed/${cleanVideoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanVideoId}&rel=0&modestbranding=1&showinfo=0&playsinline=1`}
         title="YouTube video player"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -296,7 +296,7 @@ function AudioPlayer({ videoId, isMuted, isPaused }) {
   }, [loaded]);
 
   return (
-    <div style={{ position: 'fixed', bottom: '-600px', left: '-600px', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none', zIndex: -1 }}>
+    <div style={{ position: 'fixed', bottom: '0px', left: '0px', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none', zIndex: -1, overflow: 'hidden' }}>
       <iframe
         key={srcKey}
         ref={iframeRef}
