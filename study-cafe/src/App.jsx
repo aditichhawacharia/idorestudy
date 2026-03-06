@@ -742,7 +742,7 @@ const StudyCafe = () => {
     { id: 34, name: 'Chuu',         group: 'LOONA',       videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/20251002_Chuu_%EC%B8%84_03.jpg/250px-20251002_Chuu_%EC%B8%84_03.jpg' },
     { id: 35, name: 'Yuna',         group: 'ITZY',       videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_', isPremium: false, image: 'https://pbs.twimg.com/media/E6OrSSsWYAE-Naw.jpg' },
     { id: 36, name: 'Key',         group: 'SHINEE',       videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP', isPremium: false, image: 'https://nolae.eu/cdn/shop/articles/key-shinee-profil-731664.jpg?v=1723729868&width=1200' },
-    { id: 36, name: 'Dahyun',         group: 'TWICE',       videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4', isPremium: false, image: 'https://i.pinimg.com/736x/44/1f/22/441f225db0f809e10a0b9abfda93cca5.jpg' },
+    { id: 37, name: 'Dahyun',         group: 'TWICE',       videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4', isPremium: false, image: 'https://i.pinimg.com/736x/44/1f/22/441f225db0f809e10a0b9abfda93cca5.jpg' },
 
   ];
 
