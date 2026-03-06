@@ -210,18 +210,40 @@ const fontStyle = `
 `;
 
 // ── YouTube Background ────────────────────────────────────────────────────────
-function YTBackground({ videoId }) {
+function YTBackground({ videoId, isMobile }) {
   const cleanVideoId = videoId.split('?')[0];
+  const src = `https://www.youtube.com/embed/${cleanVideoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanVideoId}&rel=0&modestbranding=1&showinfo=0&playsinline=1&enablejsapi=1`;
+
+  // On mobile, iOS blocks iframe autoplay unless the src is set synchronously
+  // inside a real user tap event. We track whether the user has tapped.
+  const [mobileSrcSet, setMobileSrcSet] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(true);
+
+  // Reset when buddy changes
+  useEffect(() => {
+    if (isMobile) {
+      setMobileSrcSet(false);
+      setShowOverlay(true);
+    }
+  }, [cleanVideoId, isMobile]);
+
+  const activeSrc = (!isMobile || mobileSrcSet) ? src : 'about:blank';
+
+  const handleTap = () => {
+    setMobileSrcSet(true);
+    setShowOverlay(false);
+  };
+
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#000' }}>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#111' }}>
       <iframe
-        width="100%" height="100%"
-        src={`https://www.youtube.com/embed/${cleanVideoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanVideoId}&rel=0&modestbranding=1&showinfo=0`}
-        title="YouTube video player"
+        key={activeSrc}
+        src={activeSrc}
+        title="Study cafe background"
         frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        referrerPolicy="strict-origin-when-cross-origin"
+        allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
+        referrerPolicy="strict-origin-when-cross-origin"
         style={{
           position: 'absolute', top: '45%', left: '50%',
           transform: 'translate(-50%, -50%)',
@@ -229,7 +251,43 @@ function YTBackground({ videoId }) {
           border: 'none', pointerEvents: 'none',
         }}
       />
-      <div style={{ position: 'absolute', inset: 0, zIndex: 2 }} />
+      <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }} />
+
+      {isMobile && showOverlay && (
+        <div
+          onClick={handleTap}
+          style={{
+            position: 'absolute', inset: 0, zIndex: 10,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            background: 'linear-gradient(135deg, rgba(20,8,35,0.94), rgba(10,5,25,0.97))',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,107,157,0.97), rgba(200,109,215,0.97))',
+            border: '3px solid rgba(255,255,255,0.3)',
+            borderRadius: '28px',
+            padding: '36px 28px',
+            textAlign: 'center',
+            boxShadow: '0 24px 80px rgba(255,107,157,0.55)',
+            maxWidth: '280px', width: '85vw',
+          }}>
+            <div style={{ fontSize: '52px', marginBottom: '14px' }}>{"☕✨"}</div>
+            <p style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '22px', color: 'white', marginBottom: '10px', lineHeight: 1.2 }}>
+              Tap to Start Vibing~
+            </p>
+            <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '14px', color: 'rgba(255,255,255,0.85)', marginBottom: '22px', lineHeight: 1.6 }}>
+              One tap to unlock your study cafe background {"💖"}
+            </p>
+            <div style={{ background: 'white', borderRadius: '999px', padding: '13px 32px', display: 'inline-flex', alignItems: 'center', gap: '10px', boxShadow: '0 8px 24px rgba(255,107,157,0.3)' }}>
+              <span style={{ fontSize: '18px' }}>{"▶️"}</span>
+              <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '15px', color: '#FF6B9D' }}>Start Cafe</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -510,7 +568,7 @@ function TodoWidget({ isMobile }) {
   return (
     <div className="todo-widget-mobile" style={{
       position: 'fixed',
-      bottom: isMobile ? '90px' : '24px',
+      bottom: isMobile ? '130px' : '24px',
       right: '24px',
       zIndex: 8000,
       display: 'flex',
@@ -695,10 +753,8 @@ function trackEvent(name, params = {}) {
   try { window.umami?.track(name, params); } catch (e) {}
 }
 
-// ── useIsMobile hook — stable, no re-render on resize to avoid killing YT iframe ──
+// ── useIsMobile hook — stable, no re-render on resize ──────────────────────────
 function useIsMobile() {
-  // Read once at mount time only — resize doesn't matter for our use case
-  // and re-renders caused by resize would remount the YT iframe killing autoplay
   const [isMobile] = useState(() => {
     try { return window.innerWidth <= 768; } catch(e) { return false; }
   });
@@ -710,7 +766,6 @@ const StudyCafe = () => {
   const isMobile = useIsMobile();
 
   const [selectedBuddy, setSelectedBuddy] = useState(null);
-  const [showMobileBanner, setShowMobileBanner] = useState(false);
   const [timerMinutes, setTimerMinutes] = useState(25);
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [isStudying, setIsStudying] = useState(true);
@@ -731,7 +786,6 @@ const StudyCafe = () => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isTimerMinimized, setIsTimerMinimized] = useState(false);
   const [isMenuBarMinimized, setIsMenuBarMinimized] = useState(false);
-  // Mobile: drawer for buddy list
   const [showMobileBuddyDrawer, setShowMobileBuddyDrawer] = useState(false);
   const timerRef = useRef(null);
 
@@ -915,62 +969,8 @@ const StudyCafe = () => {
       <>
         <style>{fontStyle}</style>
 
-        {/* ── Mobile "coming soon" banner ── */}
-        {showMobileBanner && (
-          <div style={{
-            position: 'fixed', inset: 0, zIndex: 99999,
-            background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '24px',
-          }} onClick={() => setShowMobileBanner(false)}>
-            <div onClick={e => e.stopPropagation()} style={{
-              background: 'linear-gradient(135deg, #FFF5F7, #F5F3FF)',
-              border: '3px solid #FFB6D9', borderRadius: '32px',
-              padding: '40px 32px', textAlign: 'center',
-              boxShadow: '0 32px 80px rgba(255,107,157,0.4)',
-              maxWidth: '340px', width: '100%',
-            }}>
-              <div style={{ fontSize: '64px', marginBottom: '16px' }}>💻</div>
-              <h2 style={{
-                fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '24px',
-                background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                marginBottom: '12px', lineHeight: 1.2,
-              }}>
-                Mobile coming soon! 🌸
-              </h2>
-              <p style={{
-                fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic',
-                fontSize: '17px', color: '#9B7EDB', fontWeight: 300,
-                lineHeight: 1.6, marginBottom: '28px',
-              }}>
-                We're working on the mobile experience ✨<br />
-                For now, visit on a <strong style={{ fontStyle: 'normal', color: '#FF6B9D' }}>laptop or Mac</strong> for the full café vibe ☕
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '28px' }}>
-                {['💖','✨','☕','🎵','💜'].map((e, i) => (
-                  <span key={i} style={{ fontSize: '20px' }}>{e}</span>
-                ))}
-              </div>
-              <button
-                onClick={() => setShowMobileBanner(false)}
-                style={{
-                  background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)',
-                  color: 'white', border: 'none', borderRadius: '999px',
-                  padding: '14px 36px', fontSize: '16px', fontWeight: 900,
-                  fontFamily: "'Playfair Display', serif",
-                  cursor: 'pointer', boxShadow: '0 8px 24px rgba(255,107,157,0.4)',
-                  width: '100%',
-                }}
-              >
-                Got it! 💕
-              </button>
-            </div>
-          </div>
-        )}
-
         <div className="min-h-screen relative overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #FFF5F7 0%, #FFF9FB 25%, #F5F3FF 50%, #FFF0F5 75%, #FFF5F7 100%)' }}>
-          {/* Decorative elements — hidden on mobile to avoid clutter */}
+          {/* Decorative elements — hidden on mobile */}
           {!isMobile && <>
             <div className="absolute top-20 left-12 text-4xl opacity-40 animate-bounce" style={{ animationDuration: '3s' }}>☕</div>
             <div className="absolute top-40 right-24 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>🥐</div>
@@ -1104,7 +1104,7 @@ const StudyCafe = () => {
                 {filteredBuddies.map(b => (
                   <div
                     key={b.id}
-                    onClick={() => isMobile ? setShowMobileBanner(true) : setSelectedBuddy(b)}
+                    onClick={() => setSelectedBuddy(b)}
                     style={{
                       background: 'white', borderRadius: isMobile ? '16px' : '24px',
                       overflow: 'hidden', boxShadow: '0 4px 20px rgba(255,107,157,0.15)',
@@ -1190,9 +1190,6 @@ const StudyCafe = () => {
   }
 
   // ── STUDY ROOM ────────────────────────────────────────────────────────────────
-  // On mobile: no sidebar. Instead, a top-center badge + a small "change buddy" button.
-  // Timer is top-right (fixed position). Bottom bar is horizontal scrollable or compact.
-
   const timerTopPos = isMobile ? '80px' : (timerPosition.y === 0 ? '24px' : `${timerPosition.y}px`);
   const timerRightPos = isMobile ? '12px' : (timerPosition.x === 0 ? '24px' : 'auto');
   const timerLeftPos = isMobile ? 'auto' : (timerPosition.x !== 0 ? `${timerPosition.x}px` : 'auto');
@@ -1297,14 +1294,13 @@ const StudyCafe = () => {
             );
           })}
 
-          <YTBackground key={selectedBuddy.id} videoId={selectedBuddy.videoId} />
+          <YTBackground key={selectedBuddy.id} videoId={selectedBuddy.videoId} isMobile={isMobile} />
 
           {selectedMusic && selectedMusic.videoId && (
             <AudioPlayer videoId={selectedMusic.videoId} isMuted={isMuted} isPaused={isMusicPaused} />
           )}
 
-          {/* ── Top Bar: Studying With badge ── */}
-          {/* DESKTOP: top-left corner (original position). MOBILE: centered between Back/Switch buttons */}
+          {/* ── Desktop: Studying With badge (top-left) ── */}
           {!isMobile && (
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, padding: '24px', pointerEvents: 'none' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
@@ -1331,7 +1327,7 @@ const StudyCafe = () => {
             </div>
           )}
 
-          {/* MOBILE: centered badge with back/switch buttons */}
+          {/* ── Mobile: top bar with back/switch/badge ── */}
           {isMobile && (
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, padding: '12px 16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
@@ -1513,7 +1509,7 @@ const StudyCafe = () => {
           {/* ── Bottom Menu Bar ── */}
           <div style={{
             position: 'absolute',
-            bottom: isMobile ? '12px' : '24px',
+            bottom: isMobile ? '54px' : '24px',
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 20,
@@ -1710,6 +1706,27 @@ const StudyCafe = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile bottom notice bar */}
+        {isMobile && (
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 7500,
+            background: 'linear-gradient(135deg, rgba(255,107,157,0.97), rgba(200,109,215,0.97))',
+            borderTop: '2px solid rgba(255,255,255,0.25)',
+            padding: '8px 16px 10px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            backdropFilter: 'blur(12px)',
+          }}>
+            <span style={{ fontSize: '14px' }}>{"✨📱"}</span>
+            <p style={{
+              fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic',
+              fontSize: '12px', color: 'white', fontWeight: 600, textAlign: 'center', lineHeight: 1.4,
+            }}>
+              Mobile coming soon {"🌸"} For the full vibe, open on Mac or laptop {"☕💖"}
+            </p>
+            <span style={{ fontSize: '14px' }}>{"💻✨"}</span>
+          </div>
+        )}
 
         {/* ── Mobile Buddy Drawer ── */}
         {isMobile && showMobileBuddyDrawer && (
