@@ -209,52 +209,172 @@ const fontStyle = `
   }
 `;
 
+// ── iOS autoplay helper ───────────────────────────────────────────────────────
+// iOS Safari blocks iframe autoplay unless the iframe is created (src set)
+// synchronously inside a trusted user-gesture event handler.
+// React setState is async — by the time React re-renders and sets the src,
+// the gesture trust window has expired. We must imperatively create the iframe
+// element directly inside the tap handler, then hand it off to React refs.
+
+function makeYTIframe(videoId, opts = {}) {
+  const id = videoId.split('?')[0];
+  const {
+    muted = true,
+    hidden = false,
+    loop = true,
+  } = opts;
+  const muteParam = muted ? 1 : 0;
+  const src = `https://www.youtube.com/embed/${id}?autoplay=1&mute=${muteParam}&controls=0&loop=${loop ? 1 : 0}&playlist=${id}&rel=0&modestbranding=1&showinfo=0&playsinline=1&enablejsapi=1`;
+  const iframe = document.createElement('iframe');
+  iframe.src = src;
+  iframe.allow = 'autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+  iframe.setAttribute('playsinline', '');
+  iframe.setAttribute('webkit-playsinline', '');
+  iframe.frameBorder = '0';
+  if (hidden) {
+    iframe.style.cssText = 'width:1px;height:1px;opacity:0;position:fixed;bottom:0;left:0;pointer-events:none;border:none;';
+  } else {
+    iframe.style.cssText = `
+      position:absolute;top:45%;left:50%;
+      transform:translate(-50%,-50%);
+      width:135%;height:140%;
+      border:none;pointer-events:none;
+    `;
+  }
+  return iframe;
+}
+
+function postToIframe(iframe, func, args = []) {
+  try {
+    iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*');
+  } catch (e) {}
+}
+
 // ── YouTube Background ────────────────────────────────────────────────────────
-function YTBackground({ videoId, isMobile }) {
+function YTBackground({ videoId, isMobile, musicVideoId, isMuted, isPaused, onActivated }) {
   const cleanVideoId = videoId.split('?')[0];
-  const src = `https://www.youtube.com/embed/${cleanVideoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanVideoId}&rel=0&modestbranding=1&showinfo=0&playsinline=1&enablejsapi=1`;
-
-  // On mobile, iOS blocks iframe autoplay unless the src is set synchronously
-  // inside a real user tap event. We track whether the user has tapped.
-  const [mobileSrcSet, setMobileSrcSet] = useState(false);
+  const containerRef = useRef(null);
+  const bgIframeRef = useRef(null);
   const [showOverlay, setShowOverlay] = useState(true);
+  const activatedRef = useRef(false);
 
-  // Reset when buddy changes
+  // Track latest muted/paused for music iframe (passed via refs so tap handler closure stays fresh)
+  const isMutedRef = useRef(isMuted);
+  const isPausedRef = useRef(isPaused);
+  const musicIframeRef = useRef(null);
+  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+  useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
+
+  // When buddy changes on mobile, tear down iframes and show overlay again
   useEffect(() => {
-    if (isMobile) {
-      setMobileSrcSet(false);
-      setShowOverlay(true);
-    }
+    if (!isMobile) return;
+    // Remove old iframes
+    if (bgIframeRef.current) { bgIframeRef.current.remove(); bgIframeRef.current = null; }
+    if (musicIframeRef.current) { musicIframeRef.current.remove(); musicIframeRef.current = null; }
+    activatedRef.current = false;
+    setShowOverlay(true);
   }, [cleanVideoId, isMobile]);
 
-  const activeSrc = (!isMobile || mobileSrcSet) ? src : 'about:blank';
+  // Desktop: render via React normally (no gesture restriction)
+  const desktopSrc = `https://www.youtube.com/embed/${cleanVideoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanVideoId}&rel=0&modestbranding=1&showinfo=0&playsinline=1&enablejsapi=1`;
 
-  const handleTap = () => {
-    setMobileSrcSet(true);
+  // Handle mute/pause changes for already-activated music iframe on mobile
+  useEffect(() => {
+    if (!musicIframeRef.current) return;
+    postToIframe(musicIframeRef.current, isMuted ? 'mute' : 'unMute');
+  }, [isMuted]);
+
+  useEffect(() => {
+    if (!musicIframeRef.current) return;
+    postToIframe(musicIframeRef.current, isPaused ? 'pauseVideo' : 'playVideo');
+  }, [isPaused]);
+
+  // When music track changes on mobile (after activation), swap the hidden iframe
+  const prevMusicId = useRef(musicVideoId);
+  useEffect(() => {
+    if (!isMobile || !activatedRef.current) return;
+    if (musicVideoId === prevMusicId.current) return;
+    prevMusicId.current = musicVideoId;
+    // Must swap inside a user gesture on iOS — we can't do that here.
+    // Best we can do: remove old iframe and insert new one (works on Android;
+    // on iOS it will play muted until next user tap — acceptable degradation).
+    if (musicIframeRef.current) { musicIframeRef.current.remove(); musicIframeRef.current = null; }
+    const newIframe = makeYTIframe(musicVideoId, { muted: isMutedRef.current, hidden: true });
+    document.body.appendChild(newIframe);
+    musicIframeRef.current = newIframe;
+    newIframe.addEventListener('load', () => {
+      setTimeout(() => {
+        postToIframe(newIframe, isMutedRef.current ? 'mute' : 'unMute');
+        postToIframe(newIframe, isPausedRef.current ? 'pauseVideo' : 'playVideo');
+      }, 800);
+    }, { once: true });
+  }, [musicVideoId, isMobile]);
+
+  const handleTap = (e) => {
+    if (activatedRef.current) return;
+    activatedRef.current = true;
+
+    // ── Both iframes are created synchronously inside this gesture handler ──
+    // This is the ONLY way iOS Safari allows autoplay.
+
+    // 1. Background video iframe
+    const bgIframe = makeYTIframe(cleanVideoId, { muted: true, hidden: false });
+    if (containerRef.current) {
+      containerRef.current.insertBefore(bgIframe, containerRef.current.firstChild);
+    }
+    bgIframeRef.current = bgIframe;
+
+    // 2. Music audio iframe (hidden)
+    const musicId = musicVideoId || cleanVideoId;
+    const musicIframe = makeYTIframe(musicId, { muted: false, hidden: true });
+    document.body.appendChild(musicIframe);
+    musicIframeRef.current = musicIframe;
+
+    // Apply initial mute/pause state once loaded
+    musicIframe.addEventListener('load', () => {
+      setTimeout(() => {
+        postToIframe(musicIframe, isMutedRef.current ? 'mute' : 'unMute');
+        postToIframe(musicIframe, isPausedRef.current ? 'pauseVideo' : 'playVideo');
+      }, 800);
+    }, { once: true });
+
     setShowOverlay(false);
+    if (onActivated) onActivated();
   };
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (bgIframeRef.current) bgIframeRef.current.remove();
+      if (musicIframeRef.current) musicIframeRef.current.remove();
+    };
+  }, []);
+
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#111' }}>
-      <iframe
-        key={activeSrc}
-        src={activeSrc}
-        title="Study cafe background"
-        frameBorder="0"
-        allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowFullScreen
-        referrerPolicy="strict-origin-when-cross-origin"
-        style={{
-          position: 'absolute', top: '45%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '135%', height: '140%',
-          border: 'none', pointerEvents: 'none',
-        }}
-      />
+    <div ref={containerRef} style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#111' }}>
+      {/* Desktop: React-managed iframe */}
+      {!isMobile && (
+        <iframe
+          src={desktopSrc}
+          title="Study cafe background"
+          frameBorder="0"
+          allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+          style={{
+            position: 'absolute', top: '45%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '135%', height: '140%',
+            border: 'none', pointerEvents: 'none',
+          }}
+        />
+      )}
+
       <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }} />
 
       {isMobile && showOverlay && (
         <div
+          onTouchEnd={handleTap}
           onClick={handleTap}
           style={{
             position: 'absolute', inset: 0, zIndex: 10,
@@ -279,7 +399,7 @@ function YTBackground({ videoId, isMobile }) {
               Tap to Start Vibing~
             </p>
             <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '14px', color: 'rgba(255,255,255,0.85)', marginBottom: '22px', lineHeight: 1.6 }}>
-              One tap to unlock your study cafe background {"💖"}
+              Tap once to unlock video {"&"} music 💖
             </p>
             <div style={{ background: 'white', borderRadius: '999px', padding: '13px 32px', display: 'inline-flex', alignItems: 'center', gap: '10px', boxShadow: '0 8px 24px rgba(255,107,157,0.3)' }}>
               <span style={{ fontSize: '18px' }}>{"▶️"}</span>
@@ -292,7 +412,8 @@ function YTBackground({ videoId, isMobile }) {
   );
 }
 
-// ── Audio Player ──────────────────────────────────────────────────────────────
+// ── Desktop-only Audio Player ─────────────────────────────────────────────────
+// On mobile, audio is handled imperatively inside YTBackground's tap handler.
 function AudioPlayer({ videoId, isMuted, isPaused }) {
   const iframeRef = useRef(null);
   const [loaded, setLoaded] = useState(false);
@@ -1294,9 +1415,17 @@ const StudyCafe = () => {
             );
           })}
 
-          <YTBackground key={selectedBuddy.id} videoId={selectedBuddy.videoId} isMobile={isMobile} />
+          <YTBackground
+            key={selectedBuddy.id}
+            videoId={selectedBuddy.videoId}
+            isMobile={isMobile}
+            musicVideoId={selectedMusic?.videoId || ''}
+            isMuted={isMuted}
+            isPaused={isMusicPaused}
+          />
 
-          {selectedMusic && selectedMusic.videoId && (
+          {/* Desktop only — on mobile, audio is handled inside YTBackground's tap handler */}
+          {!isMobile && selectedMusic && selectedMusic.videoId && (
             <AudioPlayer videoId={selectedMusic.videoId} isMuted={isMuted} isPaused={isMusicPaused} />
           )}
 
