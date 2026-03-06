@@ -81,164 +81,21 @@ const fontStyle = `
     background: linear-gradient(#FF6B9D, #C86DD7);
     border-radius: 99px;
   }
-
-  /* ── Mobile responsive overrides ── */
-  @media (max-width: 768px) {
-    .buddy-grid {
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: 12px !important;
-    }
-    .buddy-card-img {
-      height: 140px !important;
-    }
-    .hero-title-text {
-      font-size: 2rem !important;
-      line-height: 1.2 !important;
-    }
-    .hero-subtitle-text {
-      font-size: 1.1rem !important;
-    }
-    .group-filter-wrap {
-      gap: 8px !important;
-    }
-    .group-filter-btn {
-      padding: 8px 14px !important;
-      font-size: 12px !important;
-    }
-    .landing-padding {
-      padding: 16px !important;
-    }
-    .search-bar {
-      padding: 12px 20px !important;
-    }
-    .nav-bar {
-      margin-bottom: 24px !important;
-    }
-    .landing-header {
-      margin-bottom: 20px !important;
-    }
-    .filter-section {
-      margin-bottom: 20px !important;
-    }
-    .footer-inner {
-      flex-direction: column !important;
-      align-items: center !important;
-      text-align: center !important;
-      gap: 12px !important;
-    }
-    /* Study room mobile */
-    .sidebar-desktop {
-      display: none !important;
-    }
-    .timer-widget-mobile {
-      top: 80px !important;
-      right: 12px !important;
-      left: auto !important;
-    }
-    .bottom-menu-mobile {
-      bottom: 12px !important;
-      width: calc(100vw - 24px) !important;
-      left: 12px !important;
-      transform: none !important;
-    }
-    .todo-widget-mobile {
-      bottom: 90px !important;
-      right: 12px !important;
-    }
-    .music-dropdown-mobile {
-      width: calc(100vw - 48px) !important;
-      min-width: unset !important;
-      max-width: unset !important;
-    }
-    .cafe-dropdown-mobile {
-      width: calc(100vw - 48px) !important;
-      min-width: unset !important;
-    }
-    .todo-panel-mobile {
-      width: calc(100vw - 48px) !important;
-      max-width: 320px !important;
-    }
-    .timer-notif-mobile {
-      padding: 32px 24px !important;
-    }
-    .timer-notif-title-mobile {
-      font-size: 26px !important;
-    }
-    .timer-notif-subtitle-mobile {
-      font-size: 16px !important;
-    }
-    .studying-with-badge {
-      padding: 10px 20px !important;
-    }
-    .studying-with-name {
-      font-size: 18px !important;
-    }
-    .timer-compact-mobile {
-      width: 220px !important;
-      padding: 14px !important;
-    }
-    .timer-full-mobile {
-      width: 230px !important;
-      padding: 14px !important;
-    }
-    .timer-circle-mobile {
-      width: 120px !important;
-      height: 120px !important;
-    }
-    .bottom-bar-full {
-      gap: 8px !important;
-      padding: 12px 14px !important;
-      border-radius: 20px !important;
-      flex-wrap: nowrap !important;
-    }
-    .bottom-bar-music-label {
-      display: none !important;
-    }
-    .bottom-bar-cafe-label {
-      display: none !important;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .buddy-grid {
-      grid-template-columns: repeat(2, 1fr) !important;
-    }
-    .hero-title-text {
-      font-size: 1.65rem !important;
-    }
-  }
 `;
 
 // ── YouTube Background ────────────────────────────────────────────────────────
-function YTBackground({ videoId, isMobile }) {
+function YTBackground({ videoId }) {
   const cleanVideoId = videoId.split('?')[0];
-  // playsinline=1 is REQUIRED for iOS Safari - without it video goes fullscreen and breaks layout
-  // enablejsapi=1 needed for postMessage control
-  const src = `https://www.youtube.com/embed/${cleanVideoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanVideoId}&rel=0&modestbranding=1&showinfo=0&playsinline=1&enablejsapi=1`;
-
-  // On mobile, iOS blocks iframe autoplay unless the iframe src is set as a
-  // direct result of a real user tap. We use React state (not ref mutation)
-  // so the src attribute update happens synchronously inside the click event.
-  const [mobileSrcSet, setMobileSrcSet] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(true);
-
-  const activeSrc = (!isMobile || mobileSrcSet) ? src : 'about:blank';
-
-  const handleTap = () => {
-    setMobileSrcSet(true);
-    setShowOverlay(false);
-  };
-
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#111' }}>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#000' }}>
       <iframe
-        key={activeSrc}
-        src={activeSrc}
-        title="Study cafe background"
+        width="100%" height="100%"
+        src={`https://www.youtube.com/embed/${cleanVideoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${cleanVideoId}&rel=0&modestbranding=1&showinfo=0`}
+        title="YouTube video player"
         frameBorder="0"
-        allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowFullScreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         referrerPolicy="strict-origin-when-cross-origin"
+        allowFullScreen
         style={{
           position: 'absolute', top: '45%', left: '50%',
           transform: 'translate(-50%, -50%)',
@@ -246,48 +103,12 @@ function YTBackground({ videoId, isMobile }) {
           border: 'none', pointerEvents: 'none',
         }}
       />
-      <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }} />
-
-      {isMobile && showOverlay && (
-        <div
-          onClick={handleTap}
-          style={{
-            position: 'absolute', inset: 0, zIndex: 10,
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(135deg, rgba(20,8,35,0.94), rgba(10,5,25,0.97))',
-            cursor: 'pointer',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(255,107,157,0.97), rgba(200,109,215,0.97))',
-            border: '3px solid rgba(255,255,255,0.3)',
-            borderRadius: '28px',
-            padding: '36px 28px',
-            textAlign: 'center',
-            boxShadow: '0 24px 80px rgba(255,107,157,0.55)',
-            maxWidth: '280px', width: '85vw',
-          }}>
-            <div style={{ fontSize: '52px', marginBottom: '14px' }}>{"☕✨"}</div>
-            <p style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '22px', color: 'white', marginBottom: '10px', lineHeight: 1.2 }}>
-              Tap to Start Vibing~
-            </p>
-            <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '14px', color: 'rgba(255,255,255,0.85)', marginBottom: '22px', lineHeight: 1.6 }}>
-              One tap to unlock your study cafe background {"💖"}
-            </p>
-            <div style={{ background: 'white', borderRadius: '999px', padding: '13px 32px', display: 'inline-flex', alignItems: 'center', gap: '10px', boxShadow: '0 8px 24px rgba(255,107,157,0.3)' }}>
-              <span style={{ fontSize: '18px' }}>{"▶️"}</span>
-              <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '15px', color: '#FF6B9D' }}>Start Cafe</span>
-            </div>
-          </div>
-        </div>
-      )}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 2 }} />
     </div>
   );
 }
 
-// ── Audio Player ──────────────────────────────────────────────────────────────
+// ── Audio Player — FIX: properly sync mute/unmute via postMessage ─────────────
 function AudioPlayer({ videoId, isMuted, isPaused }) {
   const iframeRef = useRef(null);
   const [loaded, setLoaded] = useState(false);
@@ -308,6 +129,7 @@ function AudioPlayer({ videoId, isMuted, isPaused }) {
     }
   }, [newClean]);
 
+  // Send play/pause command via postMessage
   useEffect(() => {
     if (!loaded || !iframeRef.current) return;
     try {
@@ -318,6 +140,7 @@ function AudioPlayer({ videoId, isMuted, isPaused }) {
     } catch (e) {}
   }, [isPaused, loaded]);
 
+  // FIX: Send mute/unmute command via postMessage — fires every time isMuted changes
   useEffect(() => {
     if (!loaded || !iframeRef.current) return;
     const func = isMuted ? 'mute' : 'unMute';
@@ -329,10 +152,15 @@ function AudioPlayer({ videoId, isMuted, isPaused }) {
     } catch (e) {}
   }, [isMuted, loaded]);
 
-  const handleLoad = () => { setLoaded(true); };
+  // FIX: After iframe loads, immediately sync the current mute state
+  const handleLoad = () => {
+    setLoaded(true);
+  };
 
+  // FIX: After loaded state changes to true, sync mute state
   useEffect(() => {
     if (!loaded || !iframeRef.current) return;
+    // Small delay to ensure YT API is ready after load
     const t = setTimeout(() => {
       try {
         iframeRef.current.contentWindow.postMessage(
@@ -349,7 +177,7 @@ function AudioPlayer({ videoId, isMuted, isPaused }) {
   }, [loaded]);
 
   return (
-    <div style={{ position: 'fixed', bottom: '0px', left: '0px', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none', zIndex: -1, overflow: 'hidden' }}>
+    <div style={{ position: 'fixed', bottom: '-600px', left: '-600px', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none', zIndex: -1 }}>
       <iframe
         key={srcKey}
         ref={iframeRef}
@@ -366,7 +194,7 @@ function AudioPlayer({ videoId, isMuted, isPaused }) {
   );
 }
 
-// ── Timer-done alarm ──────────────────────────────────────────────────────────
+// ── Timer-done alarm via Web Audio API (plays a 3-tone café bell chime) ──
 function TimerSound({ shouldPlay, onDone }) {
   const hasPlayedRef = useRef(false);
 
@@ -375,6 +203,7 @@ function TimerSound({ shouldPlay, onDone }) {
       hasPlayedRef.current = true;
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
         const playBeep = (freq, startTime, duration) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
@@ -388,6 +217,8 @@ function TimerSound({ shouldPlay, onDone }) {
           osc.start(startTime);
           osc.stop(startTime + duration);
         };
+
+        // Pleasant 3-tone café bell chime × 2
         const t = ctx.currentTime;
         playBeep(880,  t,        0.55);
         playBeep(1100, t + 0.35, 0.55);
@@ -395,12 +226,16 @@ function TimerSound({ shouldPlay, onDone }) {
         playBeep(880,  t + 1.50, 0.55);
         playBeep(1100, t + 1.85, 0.55);
         playBeep(1320, t + 2.20, 0.90);
+
         setTimeout(() => { if (onDone) onDone(); ctx.close(); }, 3500);
       } catch (e) {
+        // Web Audio not supported — just dismiss
         setTimeout(() => { if (onDone) onDone(); }, 100);
       }
     }
-    if (!shouldPlay) { hasPlayedRef.current = false; }
+    if (!shouldPlay) {
+      hasPlayedRef.current = false;
+    }
   }, [shouldPlay, onDone]);
 
   return null;
@@ -418,7 +253,7 @@ function CafeToast({ visible, message, emoji, subtext }) {
       padding: '18px 28px',
       boxShadow: '0 20px 60px rgba(255,107,157,0.35)',
       display: 'flex', alignItems: 'center', gap: '14px',
-      minWidth: '280px', maxWidth: '90vw', backdropFilter: 'blur(20px)',
+      minWidth: '320px', maxWidth: '440px', backdropFilter: 'blur(20px)',
     }}>
       <span style={{ fontSize: '40px', lineHeight: 1 }}>{emoji}</span>
       <div>
@@ -429,7 +264,7 @@ function CafeToast({ visible, message, emoji, subtext }) {
   );
 }
 
-// ── Confetti ──────────────────────────────────────────────────────────────────
+// ── Confetti shower ───────────────────────────────────────────────────────────
 function Confetti() {
   const emojis = ['🎉', '✨', '💖', '⭐', '🌸', '🎀', '💕', '🌟', '🎊', '💝'];
   const pieces = Array.from({ length: 32 }, (_, i) => ({
@@ -443,10 +278,16 @@ function Confetti() {
     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
       {pieces.map((p, i) => (
         <span key={i} style={{
-          position: 'absolute', top: '-30px', left: p.left, fontSize: p.size,
-          animationName: 'confettiFall', animationDuration: p.duration,
-          animationDelay: p.delay, animationTimingFunction: 'linear',
-          animationFillMode: 'forwards', animationIterationCount: 'infinite',
+          position: 'absolute',
+          top: '-30px',
+          left: p.left,
+          fontSize: p.size,
+          animationName: 'confettiFall',
+          animationDuration: p.duration,
+          animationDelay: p.delay,
+          animationTimingFunction: 'linear',
+          animationFillMode: 'forwards',
+          animationIterationCount: 'infinite',
           display: 'inline-block',
         }}>{p.emoji}</span>
       ))}
@@ -454,7 +295,7 @@ function Confetti() {
   );
 }
 
-// ── Timer Done Notification ───────────────────────────────────────────────────
+// ── Big Timer Done Notification ───────────────────────────────────────────────
 function TimerDoneNotif({ visible, wasStudying, onDismiss }) {
   if (!visible) return null;
   return (
@@ -465,7 +306,7 @@ function TimerDoneNotif({ visible, wasStudying, onDismiss }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       <Confetti />
-      <div className="timer-notif-in timer-notif-mobile" style={{
+      <div className="timer-notif-in" style={{
         position: 'fixed', top: '50%', left: '50%',
         background: 'linear-gradient(135deg, #FFF5F7 0%, #F5F3FF 50%, #FFF0F5 100%)',
         border: '5px solid #FFB6D9',
@@ -475,19 +316,18 @@ function TimerDoneNotif({ visible, wasStudying, onDismiss }) {
         textAlign: 'center',
         maxWidth: '520px', width: '90vw',
         zIndex: 2,
-        boxSizing: 'border-box',
       }}>
         <div style={{ fontSize: '96px', lineHeight: 1, marginBottom: '20px' }}>
           {wasStudying ? '🎉' : '📚'}
         </div>
-        <h2 className="timer-notif-title-mobile" style={{
+        <h2 style={{
           fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '38px', lineHeight: 1.15,
           background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '14px',
         }}>
           {wasStudying ? 'Study Session Complete 🎊' : "Break's Over 🎊 "}
         </h2>
-        <p className="timer-notif-subtitle-mobile" style={{
+        <p style={{
           fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic',
           fontSize: '21px', color: '#9B7EDB', fontWeight: 300, marginBottom: '36px', lineHeight: 1.5,
         }}>
@@ -509,7 +349,6 @@ function TimerDoneNotif({ visible, wasStudying, onDismiss }) {
             fontFamily: "'Playfair Display', serif",
             cursor: 'pointer', boxShadow: '0 8px 32px rgba(255,107,157,0.45)',
             letterSpacing: '0.02em', transition: 'transform 0.15s, box-shadow 0.15s',
-            width: '100%', maxWidth: '280px',
           }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.07)'; e.currentTarget.style.boxShadow = '0 14px 42px rgba(255,107,157,0.65)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(255,107,157,0.45)'; }}
@@ -521,8 +360,8 @@ function TimerDoneNotif({ visible, wasStudying, onDismiss }) {
   );
 }
 
-// ── To-Do List ────────────────────────────────────────────────────────────────
-function TodoWidget({ isMobile }) {
+// ── To-Do List — bottom-right corner ─────────────────────────────────────────
+function TodoWidget() {
   const STORAGE_KEY = 'idorestudy_todos_v2';
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -557,13 +396,10 @@ function TodoWidget({ isMobile }) {
   const done = todos.filter(t => t.done).length;
   const total = todos.length;
 
-  const panelWidth = isMobile ? 'calc(100vw - 48px)' : '340px';
-  const maxPanelWidth = isMobile ? '320px' : '340px';
-
   return (
-    <div className="todo-widget-mobile" style={{
+    <div style={{
       position: 'fixed',
-      bottom: isMobile ? '130px' : '24px',
+      bottom: '24px',
       right: '24px',
       zIndex: 8000,
       display: 'flex',
@@ -571,16 +407,17 @@ function TodoWidget({ isMobile }) {
       alignItems: 'flex-end',
       gap: '10px',
     }}>
+      {/* Expanded panel */}
       {isOpen && !isMinimized && (
-        <div className="todo-slide-in todo-panel-mobile" style={{
+        <div className="todo-slide-in" style={{
           background: 'linear-gradient(135deg, rgba(255,245,247,0.99), rgba(245,243,255,0.99))',
           border: '3px solid #FFB6D9', borderRadius: '28px',
           padding: '20px 22px 22px',
-          width: panelWidth,
-          maxWidth: maxPanelWidth,
+          width: '340px',
           boxShadow: '0 24px 80px rgba(255,107,157,0.32)',
           backdropFilter: 'blur(20px)',
         }}>
+          {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '22px' }}>📝</span>
@@ -598,6 +435,7 @@ function TodoWidget({ isMobile }) {
             </div>
           </div>
 
+          {/* Progress */}
           {total > 0 && (
             <div style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
@@ -612,7 +450,8 @@ function TodoWidget({ isMobile }) {
             </div>
           )}
 
-          <div style={{ maxHeight: '180px', overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '7px' }}>
+          {/* Items */}
+          <div style={{ maxHeight: '220px', overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '7px' }}>
             {todos.length === 0 && (
               <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', color: '#C4A8D4', fontSize: '14px', textAlign: 'center', padding: '18px 0' }}>
                 No tasks yet~ add one below! 🌸
@@ -644,6 +483,7 @@ function TodoWidget({ isMobile }) {
             ))}
           </div>
 
+          {/* Add input */}
           <div style={{ display: 'flex', gap: '8px' }}>
             <input
               ref={inputRef}
@@ -676,6 +516,7 @@ function TodoWidget({ isMobile }) {
         </div>
       )}
 
+      {/* Minimized bar */}
       {isOpen && isMinimized && (
         <div className="todo-slide-in" style={{
           background: 'linear-gradient(135deg, rgba(255,245,247,0.99), rgba(245,243,255,0.99))',
@@ -698,6 +539,7 @@ function TodoWidget({ isMobile }) {
         </div>
       )}
 
+      {/* FAB button */}
       <button
         onClick={() => { setIsOpen(o => !o); setIsMinimized(false); }}
         style={{
@@ -716,6 +558,7 @@ function TodoWidget({ isMobile }) {
         title="To-Do List"
       >
         {isOpen ? <X style={{ width: 22, height: 22, color: 'white' }} /> : <CheckSquare style={{ width: 22, height: 22, color: 'white' }} />}
+        {/* Badge */}
         {!isOpen && total > 0 && done < total && (
           <div style={{
             position: 'absolute', top: '-4px', right: '-4px',
@@ -733,7 +576,7 @@ function TodoWidget({ isMobile }) {
   );
 }
 
-// ── TikTok Icon ───────────────────────────────────────────────────────────────
+// ── TikTok Icon SVG ───────────────────────────────────────────────────────────
 function TikTokIcon({ size = 20, color = 'currentColor' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill={color} xmlns="http://www.w3.org/2000/svg">
@@ -748,20 +591,8 @@ function trackEvent(name, params = {}) {
   try { window.umami?.track(name, params); } catch (e) {}
 }
 
-// ── useIsMobile hook — stable, no re-render on resize to avoid killing YT iframe ──
-function useIsMobile() {
-  // Read once at mount time only — resize doesn't matter for our use case
-  // and re-renders caused by resize would remount the YT iframe killing autoplay
-  const [isMobile] = useState(() => {
-    try { return window.innerWidth <= 768; } catch(e) { return false; }
-  });
-  return isMobile;
-}
-
 // ── Main App ──────────────────────────────────────────────────────────────────
 const StudyCafe = () => {
-  const isMobile = useIsMobile();
-
   const [selectedBuddy, setSelectedBuddy] = useState(null);
   const [timerMinutes, setTimerMinutes] = useState(25);
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -782,60 +613,89 @@ const StudyCafe = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isTimerMinimized, setIsTimerMinimized] = useState(false);
+  // ── NEW: bottom menu bar minimized state ──────────────────────────────────
   const [isMenuBarMinimized, setIsMenuBarMinimized] = useState(false);
-  // Mobile: drawer for buddy list
-  const [showMobileBuddyDrawer, setShowMobileBuddyDrawer] = useState(false);
   const timerRef = useRef(null);
 
+  // ── Analytics: track time spent on page ──────────────────────────────────────
   const sessionStartRef = useRef(Date.now());
   const selectedBuddyRef = useRef(null);
 
-  useEffect(() => { selectedBuddyRef.current = selectedBuddy; }, [selectedBuddy]);
+  useEffect(() => {
+    selectedBuddyRef.current = selectedBuddy;
+  }, [selectedBuddy]);
 
   useEffect(() => {
     sessionStartRef.current = Date.now();
+
     const getElapsed = () => Math.floor((Date.now() - sessionStartRef.current) / 1000);
     const getPage = () => selectedBuddyRef.current ? 'study_room' : 'landing';
     const getBuddy = () => selectedBuddyRef.current?.name ?? 'none';
+
     let heartbeatTimeout;
     const scheduleHeartbeat = () => {
       heartbeatTimeout = setTimeout(() => {
-        trackEvent('heartbeat', { active_seconds: getElapsed(), page: getPage(), buddy: getBuddy() });
+        trackEvent('heartbeat', {
+          active_seconds: getElapsed(),
+          page: getPage(),
+          buddy: getBuddy(),
+        });
         scheduleHeartbeat();
       }, 30000);
     };
     scheduleHeartbeat();
+
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
-        trackEvent('heartbeat', { active_seconds: getElapsed(), page: getPage(), buddy: getBuddy() });
+        trackEvent('heartbeat', {
+          active_seconds: getElapsed(),
+          page: getPage(),
+          buddy: getBuddy(),
+        });
         clearTimeout(heartbeatTimeout);
         scheduleHeartbeat();
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
-    const handleUnload = () => trackEvent('session_duration', { seconds: getElapsed(), page: getPage(), buddy: getBuddy() });
+
+    const handleUnload = () => {
+      trackEvent('session_duration', {
+        seconds: getElapsed(),
+        page: getPage(),
+        buddy: getBuddy(),
+      });
+    };
     window.addEventListener('beforeunload', handleUnload);
+
     return () => {
       clearTimeout(heartbeatTimeout);
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('beforeunload', handleUnload);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Reclaim focus from YouTube iframes
   useEffect(() => {
     const reclaim = () => { setTimeout(() => { try { window.focus(); } catch (e) {} }, 50); };
     window.addEventListener('blur', reclaim);
     return () => window.removeEventListener('blur', reclaim);
   }, []);
 
+  // Track buddy selection
   useEffect(() => {
     if (!selectedBuddy) return;
     trackEvent('select_buddy', { buddy: selectedBuddy.name, group: selectedBuddy.group });
   }, [selectedBuddy?.id]);
 
+  // Track timer start/stop
   useEffect(() => {
-    if (isRunning) trackEvent('timer_start', { type: isStudying ? 'study' : 'break', buddy: selectedBuddy?.name ?? 'none' });
+    if (isRunning) {
+      trackEvent('timer_start', { type: isStudying ? 'study' : 'break', buddy: selectedBuddy?.name ?? 'none' });
+    }
   }, [isRunning]);
+
+  const selectedMusicRef = useRef(null);
 
   const cafeItems = [
     { id: 1, name: 'Coffee Steam', emoji: '☕' },
@@ -864,7 +724,7 @@ const StudyCafe = () => {
   const studyBuddies = [
     { id: 1,  name: 'Rosé',         group: 'BLACKPINK',   videoId: 'oadMhHMubQ4?si=fdyQ5nAQQgIZ2KC2', isPremium: false, image: 'https://media.vogue.co.uk/photos/602503e953a6c957c223e1c2/1:1/w_1079,h_1080,c_limit/65422624_362861021078977_3034176141535337881_n.jpg' },
     { id: 2,  name: 'Jennie',       group: 'BLACKPINK',   videoId: 'Fe8kR3W9VGA?si=lOhkuY6w6hc7vlRl', isPremium: false, image: 'https://cdn-images.dzcdn.net/images/artist/56c65ac9ea451119ddc8c0b02915d103/1900x1900-000000-80-0-0.jpg' },
-    { id: 3,  name: 'Lisa',         group: 'BLACKPINK',   videoId: 'tX9rWUJUGbk?si=1cwwtiNJNLHZ6BkT', isPremium: false, image: 'https://cdn.giaoducthoidai.vn/images/b4508baace0d9fe4c8bbd296e259642eeddd55e67f3e3a0e2128ffa2d903782b4e633d640eb7428ab5b72e0feb356db5a8904041fc31274acb4faf5c0a71469e/lisa-3709.jpg' },
+    { id: 3,  name: 'Lisa',       group: 'BLACKPINK',   videoId: 'tX9rWUJUGbk?si=1cwwtiNJNLHZ6BkT', isPremium: false, image: 'https://cdn.giaoducthoidai.vn/images/b4508baace0d9fe4c8bbd296e259642eeddd55e67f3e3a0e2128ffa2d903782b4e633d640eb7428ab5b72e0feb356db5a8904041fc31274acb4faf5c0a71469e/lisa-3709.jpg' },
     { id: 5,  name: 'Jungkook',     group: 'BTS',         videoId: 'xy_mVVv4Oc0?si=XIcdkXpt9NFM70IL', isPremium: false, image: 'https://media.allure.com/photos/5d51932d40395d0008565c27/1:1/w_1117,h_1117,c_limit/BTS%20Jungkook%20The%20Fact%20Music%20Awards.jpg' },
     { id: 6,  name: 'V (Taehyung)', group: 'BTS',         videoId: 'Xt2wCvkSegU?si=RQO_W8pmXh7KOzb-', isPremium: false, image: 'https://img.wattpad.com/15924e68075c76b1fcd131b7d91bc719d50128ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f776174747061642d6d656469612d736572766963652f53746f7279496d6167652f356c67706c4c5552394c77436b413d3d2d323936302e313539363230383536306537383138613533393132303132363339332e6a7067?s=fit&w=720&h=720' },
     { id: 7,  name: 'Jimin',        group: 'BTS',         videoId: 'KxE4i8-nYEs?si=C5vcXDoBao4Ubwmr', isPremium: false, image: 'https://i0.wp.com/zaloramalaysiablog.wpcomstaging.com/wp-content/uploads/2025/10/JIMIN-FEATURE.jpeg?resize=736%2C768&ssl=1' },
@@ -878,11 +738,12 @@ const StudyCafe = () => {
     { id: 28, name: 'Felix',        group: 'Stray Kids',  videoId: 'EYpwvrJlV-s?si=3BQrSp7AtwvOucAI', isPremium: false, image: 'https://external-preview.redd.it/stray-kids-felix-becomes-the-new-face-of-gong-cha-v0-Y1dU4kACbSQRpJAnGX4dI9qrjrRZMif9kS9VM06lbSw.jpg?width=640&crop=smart&auto=webp&s=e28a6c99ae4995b2fca6fbdba49386fbebcabc1f' },
     { id: 29, name: 'Hyunjin',      group: 'Stray Kids',  videoId: 'QFfZlBdAhgs?si=dYxdJAq3oc4V6R4J', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Hyunjin_of_Stray_Kids%2C_September_24%2C_2025.png' },
     { id: 32, name: 'Yunah',        group: 'ILLIT',       videoId: 'Kz5ie0SAPJM?si=VfoZlZkZ1t2Blwoc', isPremium: false, image: 'https://www.billboard.com/wp-content/uploads/2024/06/ILLIT-Rookie-Spotlight-YUNAH-billboard-1240.jpg?w=800' },
-    { id: 33, name: 'Wonhee',       group: 'ILLIT',       videoId: 'gY5nbjT8ZYU?si=jWYNzxoQb0eYuhmb', isPremium: false, image: 'https://yt3.googleusercontent.com/XKcAXSDCdTjZbK1L-kXT0v61K-tw6xwzPn9aMmPUdbmMW8mMygmkJswoXdlMJU7DNm_oifQ8mw=s900-c-k-c0x00ffffff-no-rj' },
+    { id: 33, name: 'Wonhee',        group: 'ILLIT',       videoId: 'gY5nbjT8ZYU?si=jWYNzxoQb0eYuhmb', isPremium: false, image: 'https://yt3.googleusercontent.com/XKcAXSDCdTjZbK1L-kXT0v61K-tw6xwzPn9aMmPUdbmMW8mMygmkJswoXdlMJU7DNm_oifQ8mw=s900-c-k-c0x00ffffff-no-rj' },
     { id: 34, name: 'Chuu',         group: 'LOONA',       videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/20251002_Chuu_%EC%B8%84_03.jpg/250px-20251002_Chuu_%EC%B8%84_03.jpg' },
-    { id: 35, name: 'Yuna',         group: 'ITZY',        videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_', isPremium: false, image: 'https://pbs.twimg.com/media/E6OrSSsWYAE-Naw.jpg' },
-    { id: 36, name: 'Key',          group: 'SHINEE',      videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP', isPremium: false, image: 'https://nolae.eu/cdn/shop/articles/key-shinee-profil-731664.jpg?v=1723729868&width=1200' },
-    { id: 37, name: 'Dahyun',       group: 'TWICE',       videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4', isPremium: false, image: 'https://i.pinimg.com/736x/44/1f/22/441f225db0f809e10a0b9abfda93cca5.jpg' },
+    { id: 35, name: 'Yuna',         group: 'ITZY',       videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_', isPremium: false, image: 'https://pbs.twimg.com/media/E6OrSSsWYAE-Naw.jpg' },
+    { id: 36, name: 'Key',         group: 'SHINEE',       videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP', isPremium: false, image: 'https://nolae.eu/cdn/shop/articles/key-shinee-profil-731664.jpg?v=1723729868&width=1200' },
+    { id: 36, name: 'Dahyun',         group: 'TWICE',       videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4', isPremium: false, image: 'https://i.pinimg.com/736x/44/1f/22/441f225db0f809e10a0b9abfda93cca5.jpg' },
+
   ];
 
   const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA', 'ITZY', 'TWICE', 'SHINEE'];
@@ -901,6 +762,7 @@ const StudyCafe = () => {
     if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
   }, []);
 
+  // ── Timer countdown ───────────────────────────────────────────────────────────
   useEffect(() => {
     let interval;
     if (isRunning) {
@@ -911,12 +773,26 @@ const StudyCafe = () => {
             setPlayTimerSound(true);
             setIsMusicPaused(true);
             if (isStudying) {
-              trackEvent('timer_complete', { type: 'study', duration_minutes: 25, buddy: selectedBuddy?.name ?? 'none', group: selectedBuddy?.group ?? 'none', music: selectedMusic?.name ?? 'none' });
+              // ── NEW: track study session completion event ──
+              trackEvent('timer_complete', {
+                type: 'study',
+                duration_minutes: 25,
+                buddy: selectedBuddy?.name ?? 'none',
+                group: selectedBuddy?.group ?? 'none',
+                music: selectedMusic?.name ?? 'none',
+              });
               fireBrowserNotification('Study Session Complete! 🎉', 'Great job! Time for a café break ☕');
               setTimerDoneNotif({ visible: true, wasStudying: true });
               setTimerMinutes(5); setTimerSeconds(0); setIsStudying(false);
             } else {
-              trackEvent('timer_complete', { type: 'break', duration_minutes: 5, buddy: selectedBuddy?.name ?? 'none', group: selectedBuddy?.group ?? 'none', music: selectedMusic?.name ?? 'none' });
+              // ── NEW: track break session completion event ──
+              trackEvent('timer_complete', {
+                type: 'break',
+                duration_minutes: 5,
+                buddy: selectedBuddy?.name ?? 'none',
+                group: selectedBuddy?.group ?? 'none',
+                music: selectedMusic?.name ?? 'none',
+              });
               fireBrowserNotification("Break Time Over!", "Ready to study again? Let's go! 📚");
               setTimerDoneNotif({ visible: true, wasStudying: false });
               setTimerMinutes(25); setTimerSeconds(0); setIsStudying(true);
@@ -932,14 +808,14 @@ const StudyCafe = () => {
     return () => clearInterval(interval);
   }, [isRunning, timerMinutes, timerSeconds, isStudying]);
 
+  // Dismiss notif → resume music
   const handleTimerNotifDismiss = () => {
     setTimerDoneNotif({ visible: false, wasStudying: true });
     setIsMusicPaused(false);
   };
 
-  // Drag (desktop only)
+  // Timer drag
   const handleMouseDown = (e) => {
-    if (isMobile) return;
     if (e.target.closest('button')) return;
     setIsDragging(true);
     const rect = timerRef.current.getBoundingClientRect();
@@ -966,49 +842,29 @@ const StudyCafe = () => {
     return (
       <>
         <style>{fontStyle}</style>
-              <div>
-              <button
-                onClick={() => setShowMobileBanner(false)}
-                style={{
-                  background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)',
-                  color: 'white', border: 'none', borderRadius: '999px',
-                  padding: '14px 36px', fontSize: '16px', fontWeight: 900,
-                  fontFamily: "'Playfair Display', serif",
-                  cursor: 'pointer', boxShadow: '0 8px 24px rgba(255,107,157,0.4)',
-                  width: '100%',
-                }}
-              >
-                Got it! 💕
-              </button>
-            </div>
-        )
-
         <div className="min-h-screen relative overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #FFF5F7 0%, #FFF9FB 25%, #F5F3FF 50%, #FFF0F5 75%, #FFF5F7 100%)' }}>
-          {/* Decorative elements — hidden on mobile to avoid clutter */}
-          {!isMobile && <>
-            <div className="absolute top-20 left-12 text-4xl opacity-40 animate-bounce" style={{ animationDuration: '3s' }}>☕</div>
-            <div className="absolute top-40 right-24 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>🥐</div>
-            <Heart className="absolute top-32 right-40 w-8 h-8 text-pink-300 opacity-50 animate-pulse" style={{ animationDelay: '0.5s' }} />
-            <div className="absolute bottom-32 left-24 text-4xl opacity-40 animate-bounce" style={{ animationDelay: '2s', animationDuration: '3.5s' }}>🧋</div>
-            <div className="absolute bottom-20 right-32 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '4.5s' }}>🍰</div>
-            <Sparkles className="absolute top-1/4 right-1/4 w-8 h-8 text-purple-300 opacity-40 animate-pulse" style={{ animationDelay: '1.5s' }} />
-            <div className="absolute top-80 right-40 text-4xl opacity-25 animate-bounce" style={{ animationDelay: '0.7s', animationDuration: '4.1s' }}>💖</div>
-            <Star className="absolute top-1/3 left-1/4 w-8 h-8 text-yellow-300 opacity-40 animate-pulse" style={{ animationDelay: '0.8s' }} />
-            <div className="absolute bottom-40 right-20 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '1.2s', animationDuration: '3.7s' }}>🎀</div>
-            <Heart className="absolute top-60 left-40 w-6 h-6 text-rose-300 opacity-40 animate-pulse" style={{ animationDelay: '2s' }} />
-          </>}
+          <div className="absolute top-20 left-12 text-4xl opacity-40 animate-bounce" style={{ animationDuration: '3s' }}>☕</div>
+          <div className="absolute top-40 right-24 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>🥐</div>
+          <Heart className="absolute top-32 right-40 w-8 h-8 text-pink-300 opacity-50 animate-pulse" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute bottom-32 left-24 text-4xl opacity-40 animate-bounce" style={{ animationDelay: '2s', animationDuration: '3.5s' }}>🧋</div>
+          <div className="absolute bottom-20 right-32 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '4.5s' }}>🍰</div>
+          <Sparkles className="absolute top-1/4 right-1/4 w-8 h-8 text-purple-300 opacity-40 animate-pulse" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute top-80 right-40 text-4xl opacity-25 animate-bounce" style={{ animationDelay: '0.7s', animationDuration: '4.1s' }}>💖</div>
+          <Star className="absolute top-1/3 left-1/4 w-8 h-8 text-yellow-300 opacity-40 animate-pulse" style={{ animationDelay: '0.8s' }} />
+          <div className="absolute bottom-40 right-20 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '1.2s', animationDuration: '3.7s' }}>🎀</div>
+          <Heart className="absolute top-60 left-40 w-6 h-6 text-rose-300 opacity-40 animate-pulse" style={{ animationDelay: '2s' }} />
 
-          <div className="flex-1 w-full" style={{ maxWidth: '1280px', margin: '0 auto', padding: isMobile ? '16px' : '24px 32px' }}>
+          <div className="flex-1 max-w-7xl mx-auto px-8 py-6 w-full">
             {/* ── NAVBAR ── */}
-            <div className="nav-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '20px' : '48px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ position: 'relative' }}>
-                  <Coffee style={{ width: isMobile ? 22 : 32, height: isMobile ? 22 : 32, color: '#FF6B9D' }} />
-                  <Sparkles style={{ width: isMobile ? 10 : 16, height: isMobile ? 10 : 16, color: '#C86DD7', position: 'absolute', top: '-4px', right: '-4px' }} className="animate-pulse" />
+            <div className="flex items-center justify-between mb-12">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Coffee className="w-8 h-8 text-pink-500" />
+                  <Sparkles className="w-4 h-4 text-purple-400 absolute -top-1 -right-1 animate-pulse" />
                 </div>
                 <div>
-                  <h1 className="nav-brand" style={{ fontSize: isMobile ? '18px' : '22px', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>IdoréStudy ♡</h1>
-                  {!isMobile && <p style={{ fontSize: '10px', letterSpacing: '0.15em', fontWeight: 700, color: '#FF9DBD' }}>STUDY WITH YOUR BIAS</p>}
+                  <h1 className="nav-brand text-2xl bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">IdoréStudy ♡</h1>
+                  <p className="text-xs tracking-widest font-bold text-pink-400">STUDY WITH YOUR BIAS</p>
                 </div>
               </div>
 
@@ -1017,134 +873,84 @@ const StudyCafe = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '8px',
-                  padding: isMobile ? '8px 14px' : '10px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 20px',
                   borderRadius: '999px',
                   background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)',
-                  color: 'white', textDecoration: 'none',
-                  fontFamily: "'Playfair Display', serif", fontWeight: 900,
-                  fontSize: isMobile ? '12px' : '14px',
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontFamily: "'Playfair Display', serif",
+                  fontWeight: 900,
+                  fontSize: '14px',
                   boxShadow: '0 4px 20px rgba(255,107,157,0.4)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
-                  whiteSpace: 'nowrap',
+                  letterSpacing: '0.01em',
                 }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.06)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(255,107,157,0.55)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(255,107,157,0.4)'; }}
               >
-                <TikTokIcon size={isMobile ? 14 : 18} color="white" />
-                {isMobile ? '@idore' : '@idore.collections'}
+                <TikTokIcon size={18} color="white" />
+                @idore.collections
               </a>
             </div>
 
-            {/* ── HERO ── */}
-            <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '40px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '12px' }}>
-                <Heart style={{ width: isMobile ? 20 : 28, height: isMobile ? 20 : 28, color: '#FF6B9D' }} className="animate-pulse" />
-                <Star style={{ width: isMobile ? 20 : 28, height: isMobile ? 20 : 28, color: '#FBBF24' }} className="animate-pulse" />
-                <Sparkles style={{ width: isMobile ? 20 : 28, height: isMobile ? 20 : 28, color: '#C86DD7' }} className="animate-pulse" />
+            <div className="text-center mb-10">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Heart className="w-7 h-7 text-pink-400 animate-pulse" />
+                <Star className="w-7 h-7 text-yellow-400 animate-pulse" style={{ animationDelay: '0.3s' }} />
+                <Sparkles className="w-7 h-7 text-purple-400 animate-pulse" style={{ animationDelay: '0.6s' }} />
               </div>
-              <h2 className="hero-title hero-title-text" style={{
-                fontSize: isMobile ? '1.9rem' : '3.75rem',
-                marginBottom: '12px',
-                background: 'linear-gradient(135deg, #FF6B9D, #C86DD7, #818CF8)',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                lineHeight: 1.2,
-              }}>
+              <h2 className="hero-title text-6xl mb-3 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
                 Who are you studying with today? 💖
               </h2>
-              <p className="hero-subtitle hero-subtitle-text" style={{ fontSize: isMobile ? '1rem' : '1.5rem', color: '#9CA3AF' }}>
-                Pick your bias, grab a latte, and let's ace this together ☕✨
-              </p>
+              <p className="hero-subtitle text-2xl text-gray-500">Pick your bias, grab a latte, and let's ace this together ☕✨</p>
             </div>
-
-            {/* ── SEARCH ── */}
-            <div style={{ maxWidth: '560px', margin: '0 auto', marginBottom: isMobile ? '16px' : '28px', padding: '0 4px' }}>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  placeholder="Search your fave idol... 🔍"
-                  className="search-bar"
-                  style={{
-                    width: '100%', padding: isMobile ? '12px 18px' : '16px 24px',
-                    borderRadius: '999px', border: '2px solid #FFD7E5',
-                    outline: 'none', boxShadow: '0 4px 20px rgba(255,107,157,0.12)',
-                    background: 'white', fontSize: '14px', boxSizing: 'border-box',
-                    fontFamily: 'inherit',
-                  }}
-                />
-                <Heart style={{ width: 20, height: 20, color: '#FFB6D9', position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)' }} />
+            <div className="max-w-xl mx-auto mb-8">
+              <div className="relative">
+                <input type="text" placeholder="Search your fave idol... 🔍" className="w-full px-6 py-4 rounded-full border-3 focus:outline-none shadow-lg bg-white focus:shadow-xl transition" style={{ borderColor: '#FFD7E5' }} />
+                <div className="absolute right-6 top-1/2 transform -translate-y-1/2"><Heart className="w-5 h-5 text-pink-300" /></div>
               </div>
             </div>
-
-            {/* ── GROUP FILTER ── */}
-            <div className="filter-section" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? '6px' : '10px', marginBottom: isMobile ? '16px' : '40px', flexWrap: 'wrap', padding: '0 4px' }}>
+            <div className="flex items-center justify-center gap-3 mb-12 flex-wrap">
               {groups.map(group => (
-                <button
-                  key={group}
-                  onClick={() => setSelectedCategory(group)}
-                  className="group-filter-btn"
-                  style={{
-                    padding: isMobile ? '7px 12px' : '10px 20px',
-                    borderRadius: '999px', fontWeight: 700, fontSize: isMobile ? '11px' : '13px',
-                    border: selectedCategory === group ? 'none' : '2px solid #FFE0EC',
-                    background: selectedCategory === group
-                      ? 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)'
-                      : 'white',
-                    color: selectedCategory === group ? 'white' : '#555',
-                    cursor: 'pointer',
-                    boxShadow: selectedCategory === group ? '0 4px 16px rgba(255,107,157,0.4)' : '0 2px 8px rgba(255,107,157,0.1)',
-                    transition: 'all 0.2s',
-                    transform: selectedCategory === group ? 'scale(1.08)' : 'scale(1)',
-                  }}
-                >
+                <button key={group} onClick={() => setSelectedCategory(group)}
+                  className={`px-6 py-3 rounded-full font-bold transition-all shadow-lg transform hover:scale-110 ${selectedCategory === group ? 'text-white shadow-2xl scale-110' : 'bg-white border-2 border-pink-200 hover:bg-pink-50 text-gray-700'}`}
+                  style={selectedCategory === group ? { background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' } : {}}>
                   {group === 'All' ? '✨ All' : group}
                 </button>
               ))}
             </div>
-
-            {/* ── BUDDY GRID ── */}
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: isMobile ? '12px' : '20px' }}>
-                <Users style={{ width: 20, height: 20, color: '#FF6B9D' }} />
-                <h3 style={{ fontSize: isMobile ? '18px' : '22px', fontWeight: 900, background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  Choose Your Study Partner
-                </h3>
-                <Heart style={{ width: 18, height: 18, color: '#FF9DBD' }} className="animate-pulse" />
+              <div className="flex items-center gap-3 mb-6">
+                <Users className="w-6 h-6 text-pink-500" />
+                <h3 className="text-2xl font-black bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Choose Your Study Partner</h3>
+                <Heart className="w-5 h-5 text-pink-400 animate-pulse" />
               </div>
-
-              <div className="buddy-grid" style={{
-                display: 'grid',
-                gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-                gap: isMobile ? '12px' : '20px',
-              }}>
+              <div className="grid grid-cols-4 gap-6">
                 {filteredBuddies.map(b => (
-                  <div
-                    key={b.id}
-                    onClick={() => setSelectedBuddy(b)}
-                    style={{
-                      background: 'white', borderRadius: isMobile ? '16px' : '24px',
-                      overflow: 'hidden', boxShadow: '0 4px 20px rgba(255,107,157,0.15)',
-                      border: '2px solid #FFE0EC', cursor: 'pointer',
-                      transition: 'all 0.25s', position: 'relative',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(255,107,157,0.3)'; e.currentTarget.style.borderColor = '#FFB6D9'; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(255,107,157,0.15)'; e.currentTarget.style.borderColor = '#FFE0EC'; }}
-                  >
+                  <div key={b.id} onClick={() => setSelectedBuddy(b)}
+                    className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all cursor-pointer transform hover:scale-105 hover:-translate-y-2 group relative border-2 border-pink-100 hover:border-pink-300">
                     {b.isPremium && (
-                      <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 10, padding: '4px 10px', borderRadius: '999px', fontSize: '10px', fontWeight: 900, background: 'linear-gradient(135deg, #FFD700, #FFA500)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Crown style={{ width: 10, height: 10, color: 'white' }} /><span style={{ color: 'white' }}>PREMIUM</span>
+                      <div className="absolute top-3 right-3 z-10 px-3 py-1.5 rounded-full text-xs font-black flex items-center gap-1.5 shadow-xl" style={{ background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' }}>
+                        <Crown className="w-3.5 h-3.5 text-white" /><span className="text-white">PREMIUM</span>
                       </div>
                     )}
-                    <img
-                      src={b.image} alt={b.name}
-                      className="buddy-card-img"
-                      style={{ width: '100%', height: isMobile ? '130px' : '200px', objectFit: 'cover', display: 'block' }}
-                    />
-                    <div style={{ padding: isMobile ? '10px' : '16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div className="relative">
+                      <img src={b.image} alt={b.name} className="w-full h-56 object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform">
+                        <div className="flex items-center gap-2"><Heart className="w-4 h-4 text-pink-400" /><span className="text-white text-xs font-bold">Click to study together!</span></div>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <div className="flex items-start justify-between">
                         <div>
-                          <p style={{ fontWeight: 900, fontSize: isMobile ? '13px' : '16px', color: '#333', marginBottom: '2px' }}>{b.name}</p>
-                          <p style={{ fontSize: isMobile ? '10px' : '12px', fontWeight: 700, background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{b.group}</p>
+                          <h3 className="font-black text-lg text-gray-800 mb-1">{b.name}</h3>
+                          <p className="text-xs font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">{b.group}</p>
                         </div>
-                        <Heart style={{ width: isMobile ? 14 : 18, height: isMobile ? 14 : 18, color: '#FFB6D9', flexShrink: 0 }} />
+                        <Heart className="w-5 h-5 text-pink-300 group-hover:text-pink-500 group-hover:fill-pink-500 transition" />
                       </div>
                     </div>
                   </div>
@@ -1158,10 +964,12 @@ const StudyCafe = () => {
             width: '100%',
             background: 'linear-gradient(135deg, rgba(255,107,157,0.08), rgba(200,109,215,0.08))',
             borderTop: '2px solid #FFD7E5',
-            padding: isMobile ? '20px 20px' : '28px 48px',
+            padding: '28px 48px',
             marginTop: '48px',
+            position: 'relative',
+            zIndex: 10,
           }}>
-            <div className="footer-inner" style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+            <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ position: 'relative' }}>
                   <Coffee style={{ width: 22, height: 22, color: '#FF6B9D' }} />
@@ -1171,6 +979,7 @@ const StudyCafe = () => {
                   IdoréStudy ♡
                 </span>
               </div>
+
               <div style={{ textAlign: 'center', flex: 1 }}>
                 <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '14px', color: '#B8A0CC', fontWeight: 300 }}>
                   Study harder, dream bigger, stan forever ✨
@@ -1181,10 +990,18 @@ const StudyCafe = () => {
                   ))}
                 </div>
               </div>
-              <div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                 <a
                   href="mailto:idore.collections@gmail.com"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '13px', color: '#C4A8D4', textDecoration: 'none', cursor: 'pointer', transition: 'color 0.2s' }}
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: '13px',
+                    color: '#C4A8D4',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    transition: 'color 0.2s',
+                  }}
                   onMouseEnter={e => e.target.style.color = '#FF6B9D'}
                   onMouseLeave={e => e.target.style.color = '#C4A8D4'}
                 >
@@ -1204,94 +1021,81 @@ const StudyCafe = () => {
   }
 
   // ── STUDY ROOM ────────────────────────────────────────────────────────────────
-  // On mobile: no sidebar. Instead, a top-center badge + a small "change buddy" button.
-  // Timer is top-right (fixed position). Bottom bar is horizontal scrollable or compact.
-
-  const timerTopPos = isMobile ? '80px' : (timerPosition.y === 0 ? '24px' : `${timerPosition.y}px`);
-  const timerRightPos = isMobile ? '12px' : (timerPosition.x === 0 ? '24px' : 'auto');
-  const timerLeftPos = isMobile ? 'auto' : (timerPosition.x !== 0 ? `${timerPosition.x}px` : 'auto');
-
   return (
     <>
       <style>{fontStyle}</style>
       <div className="min-h-screen flex relative overflow-hidden" style={{ backgroundColor: '#2D2D3D' }}>
 
         <CafeToast visible={toast.visible} message={toast.message} emoji={toast.emoji} subtext={toast.subtext} />
-        <TimerDoneNotif visible={timerDoneNotif.visible} wasStudying={timerDoneNotif.wasStudying} onDismiss={handleTimerNotifDismiss} />
-        <TimerSound shouldPlay={playTimerSound} onDone={() => setPlayTimerSound(false)} />
 
-        {/* ── Desktop Sidebar ── */}
-        {!isMobile && (
-          <div className={`transition-all duration-300 ${showSidebar ? 'w-80' : 'w-0'} flex-shrink-0 overflow-hidden sidebar-desktop`}
-            style={{ background: 'linear-gradient(180deg, #FFF5F7 0%, #F5F3FF 50%, #FFF0F5 100%)', borderRight: '4px solid #FFB6D9' }}>
-            <div className="h-screen overflow-y-auto p-6">
-              <div className="flex items-center justify-between mb-6 sticky top-0 bg-gradient-to-b from-pink-50 to-transparent pb-4 z-10">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Heart style={{ width: 24, height: 24, color: '#FF6B9D' }} className="animate-pulse" />
-                  <h2 className="nav-brand" style={{ fontSize: '20px', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>IdoreStudy</h2>
-                  <Sparkles style={{ width: 20, height: 20, color: '#C86DD7' }} />
-                </div>
-                <button onClick={() => setShowSidebar(false)} className="p-2 rounded-full hover:bg-pink-100 transition transform hover:scale-110">
-                  <ChevronLeft style={{ width: 20, height: 20, color: '#FF6B9D' }} />
-                </button>
+        <TimerDoneNotif
+          visible={timerDoneNotif.visible}
+          wasStudying={timerDoneNotif.wasStudying}
+          onDismiss={handleTimerNotifDismiss}
+        />
+
+        <TimerSound
+          shouldPlay={playTimerSound}
+          onDone={() => setPlayTimerSound(false)}
+        />
+
+        {/* Left Sidebar */}
+        <div className={`transition-all duration-300 ${showSidebar ? 'w-80' : 'w-0'} flex-shrink-0 overflow-hidden`}
+          style={{ background: 'linear-gradient(180deg, #FFF5F7 0%, #F5F3FF 50%, #FFF0F5 100%)', borderRight: '4px solid #FFB6D9' }}>
+          <div className="h-screen overflow-y-auto p-6">
+            <div className="flex items-center justify-between mb-6 sticky top-0 bg-gradient-to-b from-pink-50 to-transparent pb-4 z-10">
+              <div className="flex items-center gap-2">
+                <Heart className="w-6 h-6 text-pink-500 animate-pulse" />
+                <h2 className="nav-brand text-xl bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">IdoreStudy</h2>
+                <Sparkles className="w-5 h-5 text-purple-400" />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '96px' }}>
-                {studyBuddies.map(buddy => (
-                  <button key={buddy.id} onClick={() => setSelectedBuddy(buddy)}
-                    style={{
-                      width: '100%', borderRadius: '16px', overflow: 'hidden', cursor: 'pointer',
-                      background: 'white',
-                      border: selectedBuddy.id === buddy.id ? '3px solid #FF6B9D' : '2px solid #FFD7E5',
-                      boxShadow: selectedBuddy.id === buddy.id ? '0 8px 24px rgba(255,107,157,0.3)' : '0 2px 12px rgba(255,107,157,0.1)',
-                      transform: selectedBuddy.id === buddy.id ? 'scale(1.03)' : 'scale(1)',
-                      transition: 'all 0.2s',
-                    }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px' }}>
-                      <div style={{ position: 'relative' }}>
-                        <img src={buddy.image} alt={buddy.name} style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '12px' }} />
-                        {selectedBuddy.id === buddy.id && (
-                          <div style={{ position: 'absolute', bottom: '-4px', right: '-4px', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', borderRadius: '50%', padding: '4px' }}>
-                            <Heart style={{ width: 10, height: 10, color: 'white', fill: 'white' }} />
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ textAlign: 'left', flex: 1 }}>
-                        <p style={{ fontWeight: 900, fontSize: '14px', color: '#333', marginBottom: '2px' }}>{buddy.name}</p>
-                        <p style={{ fontSize: '11px', fontWeight: 700, background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{buddy.group}</p>
-                      </div>
-                      {selectedBuddy.id === buddy.id && <Sparkles style={{ width: 16, height: 16, color: '#FF6B9D' }} className="animate-pulse" />}
+              <button onClick={() => setShowSidebar(false)} className="p-2 rounded-full hover:bg-pink-100 transition transform hover:scale-110">
+                <ChevronLeft className="w-5 h-5 text-pink-500" />
+              </button>
+            </div>
+            <div className="space-y-3 pb-24">
+              {studyBuddies.map(buddy => (
+                <button key={buddy.id} onClick={() => setSelectedBuddy(buddy)}
+                  className={`w-full rounded-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden ${selectedBuddy.id === buddy.id ? 'shadow-2xl scale-105' : 'shadow-lg'}`}
+                  style={{ background: 'white', border: selectedBuddy.id === buddy.id ? '3px solid #FF6B9D' : '2px solid #FFD7E5' }}>
+                  <div className="flex items-center gap-3 p-2.5">
+                    <div className="relative">
+                      <img src={buddy.image} alt={buddy.name} className="w-16 h-16 object-cover rounded-xl" />
+                      {selectedBuddy.id === buddy.id && (
+                        <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full p-1">
+                          <Heart className="w-3 h-3 text-white fill-white" />
+                        </div>
+                      )}
                     </div>
-                  </button>
-                ))}
-              </div>
-              <div style={{ position: 'sticky', bottom: 0, background: 'linear-gradient(to top, #FFF5F7, transparent)', paddingTop: '16px' }}>
-                <button onClick={() => setSelectedBuddy(null)}
-                  style={{ width: '100%', padding: '16px', borderRadius: '16px', fontWeight: 900, color: 'white', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(255,107,157,0.4)', transition: 'transform 0.15s' }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
-                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <Coffee style={{ width: 20, height: 20 }} />Back to Café<Heart style={{ width: 16, height: 16 }} />
+                    <div className="text-left flex-1">
+                      <p className="font-black text-sm text-gray-800">{buddy.name}</p>
+                      <p className="text-xs font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">{buddy.group}</p>
+                    </div>
+                    {selectedBuddy.id === buddy.id && <Sparkles className="w-4 h-4 text-pink-500 animate-pulse" />}
                   </div>
                 </button>
-              </div>
+              ))}
+            </div>
+            <div className="sticky bottom-0 bg-gradient-to-t from-pink-50 to-transparent pt-4">
+              <button onClick={() => setSelectedBuddy(null)}
+                className="w-full py-4 rounded-2xl font-black text-white shadow-2xl transition transform hover:scale-105"
+                style={{ background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' }}>
+                <div className="flex items-center justify-center gap-2"><Coffee className="w-5 h-5" />Back to Café<Heart className="w-4 h-4" /></div>
+              </button>
             </div>
           </div>
-        )}
+        </div>
 
-        {!isMobile && !showSidebar && (
+        {!showSidebar && (
           <button onClick={() => setShowSidebar(true)}
-            style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 50, padding: '16px', borderRadius: '16px', background: 'linear-gradient(135deg, #FFD1DC, #E6A8D7)', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(255,107,157,0.35)', transition: 'transform 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-          >
-            <ChevronRight style={{ width: 24, height: 24, color: 'white' }} />
+            className="absolute top-6 left-6 z-50 p-4 rounded-2xl shadow-2xl transition transform hover:scale-110 animate-pulse"
+            style={{ background: 'linear-gradient(135deg, #FFD1DC 0%, #E6A8D7 100%)' }}>
+            <ChevronRight className="w-6 h-6 text-white" />
           </button>
         )}
 
         {/* Main Content */}
-        <div className="flex-1 relative h-screen overflow-hidden" style={{ minHeight: '100vh' }}>
-
+        <div className="flex-1 relative h-screen overflow-hidden">
           {activeCafeItems.map((itemId, index) => {
             const item = cafeItems.find(i => i.id === itemId);
             const positions = [
@@ -1301,182 +1105,106 @@ const StudyCafe = () => {
               { bottom: '45%', left: '12%' }, { top: '35%', right: '12%' },
             ];
             return (
-              <div key={itemId} style={{
-                position: 'absolute', zIndex: 20, fontSize: isMobile ? '40px' : '60px', opacity: 0.4, pointerEvents: 'none',
-                animation: `bounce ${3 + index * 0.5}s infinite`, animationDelay: `${index * 0.3}s`,
-                ...positions[index % positions.length],
-              }}>
+              <div key={itemId} className="absolute z-20 text-6xl opacity-40 animate-bounce pointer-events-none"
+                style={{ ...positions[index % positions.length], animationDuration: `${3 + index * 0.5}s`, animationDelay: `${index * 0.3}s` }}>
                 {item?.emoji}
               </div>
             );
           })}
 
-          <YTBackground key={selectedBuddy.id} videoId={selectedBuddy.videoId} isMobile={isMobile} />
+          <YTBackground key={selectedBuddy.id} videoId={selectedBuddy.videoId} />
 
           {selectedMusic && selectedMusic.videoId && (
             <AudioPlayer videoId={selectedMusic.videoId} isMuted={isMuted} isPaused={isMusicPaused} />
           )}
 
-          {/* ── Top Bar: Studying With badge ── */}
-          {/* DESKTOP: top-left corner (original position). MOBILE: centered between Back/Switch buttons */}
-          {!isMobile && (
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, padding: '24px', pointerEvents: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-                <div style={{
-                  backdropFilter: 'blur(20px)', padding: '16px 32px',
-                  borderRadius: '24px', boxShadow: '0 8px 32px rgba(255,107,157,0.4)',
-                  background: 'linear-gradient(135deg, rgba(255,107,157,0.92), rgba(200,109,215,0.92))',
-                  border: '2px solid rgba(255,255,255,0.3)',
-                  pointerEvents: 'auto',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                    <Heart style={{ width: 20, height: 20, color: 'white', fill: 'white' }} className="animate-pulse" />
-                    <p style={{ fontSize: '12px', letterSpacing: '0.15em', fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>STUDYING WITH</p>
-                    <Sparkles style={{ width: 16, height: 16, color: '#FFD700' }} />
-                  </div>
-                  <p style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '22px', color: 'white', textAlign: 'center' }}>
-                    {selectedBuddy.name}
-                  </p>
-                  <p style={{ fontSize: '12px', textAlign: 'center', color: 'rgba(255,255,255,0.75)', fontWeight: 600, marginTop: '2px' }}>
-                    {selectedBuddy.group}
-                  </p>
+          {/* Top Bar */}
+          <div className="absolute top-0 left-0 right-200 z-20 p-6">
+            <div className="flex items-center justify-between">
+              <div className="w-24" />
+              <div className="backdrop-blur-xl px-8 py-4 rounded-3xl shadow-2xl border-3"
+                style={{ background: 'linear-gradient(135deg, rgba(255,107,157,0.95), rgba(200,109,215,0.95))', borderColor: 'rgba(255,255,255,0.3)' }}>
+                <div className="flex items-center gap-3 mb-1">
+                  <Heart className="w-5 h-5 text-white fill-white animate-pulse" />
+                  <p className="text-xs tracking-widest font-bold text-pink-100">STUDYING WITH</p>
+                  <Sparkles className="w-4 h-4 text-yellow-200" />
                 </div>
+                <p className="text-2xl font-black text-white text-center">{selectedBuddy.name}</p>
+                <p className="text-xs text-center text-pink-100 font-semibold mt-1">{selectedBuddy.group}</p>
               </div>
+              <div className="w-24" />
             </div>
-          )}
+          </div>
 
-          {/* MOBILE: centered badge with back/switch buttons */}
-          {isMobile && (
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, padding: '12px 16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                <button
-                  onClick={() => setSelectedBuddy(null)}
-                  style={{
-                    background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(12px)',
-                    border: '2px solid rgba(255,255,255,0.35)', borderRadius: '14px',
-                    padding: '8px 12px', color: 'white', fontWeight: 900, fontSize: '12px',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
-                    fontFamily: "'Playfair Display', serif",
-                  }}
-                >
-                  <ChevronLeft style={{ width: 14, height: 14 }} />
-                  Café
-                </button>
-
-                <div style={{
-                  backdropFilter: 'blur(20px)', padding: '10px 18px',
-                  borderRadius: '24px', boxShadow: '0 8px 32px rgba(255,107,157,0.4)',
-                  background: 'linear-gradient(135deg, rgba(255,107,157,0.92), rgba(200,109,215,0.92))',
-                  border: '2px solid rgba(255,255,255,0.3)',
-                  flex: 1, textAlign: 'center',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '2px' }}>
-                    <Heart style={{ width: 12, height: 12, color: 'white', fill: 'white' }} className="animate-pulse" />
-                    <p style={{ fontSize: '10px', letterSpacing: '0.15em', fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>STUDYING WITH</p>
-                  </div>
-                  <p style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '16px', color: 'white' }}>
-                    {selectedBuddy.name}
-                  </p>
-                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.75)', fontWeight: 600, marginTop: '2px' }}>
-                    {selectedBuddy.group}
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => setShowMobileBuddyDrawer(true)}
-                  style={{
-                    background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(12px)',
-                    border: '2px solid rgba(255,255,255,0.35)', borderRadius: '14px',
-                    padding: '8px 12px', color: 'white', fontWeight: 900, fontSize: '12px',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
-                    fontFamily: "'Playfair Display', serif",
-                  }}
-                >
-                  <Users style={{ width: 14, height: 14 }} />
-                  Switch
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ── Draggable/Fixed Timer ── */}
+          {/* Draggable Timer */}
           <div
             ref={timerRef}
+            className="absolute z-30 cursor-move"
             style={{
-              position: 'absolute', zIndex: 30,
-              cursor: isMobile ? 'default' : 'move',
-              top: timerTopPos,
-              right: timerRightPos,
-              left: timerLeftPos,
+              top: timerPosition.y === 0 ? '24px' : `${timerPosition.y}px`,
+              right: timerPosition.x === 0 ? '24px' : 'auto',
+              left: timerPosition.x !== 0 ? `${timerPosition.x}px` : 'auto',
             }}
             onMouseDown={handleMouseDown}
           >
             {isTimerMinimized ? (
-              <div style={{
-                borderRadius: '16px', padding: isMobile ? '10px 14px' : '16px',
-                border: '3px solid #FFD7E5', backdropFilter: 'blur(16px)',
-                background: 'linear-gradient(135deg, rgba(255,245,247,0.95), rgba(245,243,255,0.95))',
-                boxShadow: '0 8px 32px rgba(255,107,157,0.25)',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: isMobile ? '18px' : '22px', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent', color: '#FF6B9D' }}>
+              <div className="rounded-2xl shadow-2xl p-4 border-4 border-pink-200 backdrop-blur-md"
+                style={{ background: 'linear-gradient(135deg, rgba(255,245,247,0.95), rgba(245,243,255,0.95))' }}>
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl font-black bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
                     {formatTime(timerMinutes, timerSeconds)}
                   </div>
                   <button onClick={(e) => { e.stopPropagation(); setIsRunning(r => !r); }}
-                    style={{ background: '#FFE5F1', border: 'none', borderRadius: '10px', padding: '8px', cursor: 'pointer', lineHeight: 0 }}>
-                    {isRunning ? <Pause style={{ width: 16, height: 16, color: '#FF6B9D' }} /> : <Play style={{ width: 16, height: 16, color: '#FF6B9D' }} />}
+                    className="p-2 rounded-xl transition-all transform hover:scale-110 bg-pink-100 hover:bg-pink-200">
+                    {isRunning ? <Pause className="w-4 h-4 text-pink-600" /> : <Play className="w-4 h-4 text-pink-600" />}
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); setIsTimerMinimized(false); }}
-                    style={{ background: '#F0EBFF', border: 'none', borderRadius: '10px', padding: '8px', cursor: 'pointer', lineHeight: 0 }}>
-                    <Maximize2 style={{ width: 16, height: 16, color: '#C86DD7' }} />
+                    className="p-2 rounded-xl transition-all transform hover:scale-110 bg-purple-100 hover:bg-purple-200">
+                    <Maximize2 className="w-4 h-4 text-purple-600" />
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="timer-full-mobile" style={{
-                borderRadius: '24px', padding: '20px', width: isMobile ? '220px' : '288px',
-                border: '3px solid #FFD7E5',
-                background: 'linear-gradient(135deg, #FFF5F7 0%, #F5F3FF 100%)',
-                boxShadow: '0 16px 56px rgba(255,107,157,0.3)',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '30px', height: '30px', borderRadius: '10px', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Clock style={{ width: 16, height: 16, color: 'white' }} />
+              <div className="rounded-3xl shadow-2xl p-5 w-72 border-4 border-pink-200"
+                style={{ background: 'linear-gradient(135deg, #FFF5F7 0%, #F5F3FF 100%)' }}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-white" />
                     </div>
-                    <span style={{ fontWeight: 900, fontSize: '12px', color: '#333', letterSpacing: '0.05em' }}>FOCUS TIME</span>
+                    <span className="font-black text-sm text-gray-800">FOCUS TIME</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '4px' }}>
+                  <div className="flex gap-1">
                     <button onClick={(e) => { e.stopPropagation(); setIsTimerMinimized(true); }}
-                      style={{ background: 'none', border: 'none', padding: '6px', cursor: 'pointer', borderRadius: '8px', lineHeight: 0 }}>
-                      <Minimize2 style={{ width: 14, height: 14, color: '#666' }} />
+                      className="p-1.5 hover:bg-pink-100 rounded-xl transition">
+                      <Minimize2 className="w-3.5 h-3.5 text-gray-600" />
                     </button>
-                    <button style={{ background: 'none', border: 'none', padding: '6px', cursor: 'pointer', borderRadius: '8px', lineHeight: 0 }}>
-                      <Settings style={{ width: 14, height: 14, color: '#666' }} />
+                    <button className="p-1.5 hover:bg-pink-100 rounded-xl transition">
+                      <Settings className="w-3.5 h-3.5 text-gray-600" />
                     </button>
                   </div>
                 </div>
-
-                <div style={{ display: 'flex', gap: '8px', marginBottom: isMobile ? '12px' : '20px' }}>
+                <div className="flex gap-2 mb-5">
                   <button onClick={(e) => { e.stopPropagation(); setIsStudying(true); setTimerMinutes(25); setTimerSeconds(0); setIsRunning(false); }}
-                    style={{ flex: 1, padding: isMobile ? '8px' : '10px', borderRadius: '14px', fontWeight: 700, fontSize: '12px', border: 'none', cursor: 'pointer', background: isStudying ? 'linear-gradient(135deg, #FF6B9D, #C86DD7)' : '#FFE5F1', color: isStudying ? 'white' : '#9CA3AF', boxShadow: isStudying ? '0 4px 16px rgba(255,107,157,0.4)' : 'none', transition: 'all 0.2s' }}>
+                    className={`flex-1 py-2.5 rounded-2xl font-bold text-xs transition-all transform hover:scale-105 ${isStudying ? 'text-white shadow-xl scale-105' : 'hover:bg-pink-50'}`}
+                    style={isStudying ? { background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' } : { backgroundColor: '#FFE5F1', color: '#9CA3AF' }}>
                     📚 Study
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); setIsStudying(false); setTimerMinutes(5); setTimerSeconds(0); setIsRunning(false); }}
-                    style={{ flex: 1, padding: isMobile ? '8px' : '10px', borderRadius: '14px', fontWeight: 700, fontSize: '12px', border: 'none', cursor: 'pointer', background: !isStudying ? 'linear-gradient(135deg, #FF6B9D, #C86DD7)' : '#FFE5F1', color: !isStudying ? 'white' : '#9CA3AF', boxShadow: !isStudying ? '0 4px 16px rgba(255,107,157,0.4)' : 'none', transition: 'all 0.2s' }}>
+                    className={`flex-1 py-2.5 rounded-2xl font-bold text-xs transition-all transform hover:scale-105 ${!isStudying ? 'text-white shadow-xl scale-105' : 'hover:bg-pink-50'}`}
+                    style={!isStudying ? { background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' } : { backgroundColor: '#FFE5F1', color: '#9CA3AF' }}>
                     ☕ Break
                   </button>
                 </div>
-
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? '12px' : '20px' }}>
-                  <div style={{ position: 'relative', width: isMobile ? '120px' : '160px', height: isMobile ? '120px' : '160px' }}>
-                    <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'linear-gradient(135deg, rgba(255,209,220,0.5), rgba(230,168,215,0.5))', animation: 'pulse 3s infinite' }} />
-                    <svg style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)', position: 'relative', zIndex: 1 }}>
-                      <circle cx={isMobile ? 60 : 80} cy={isMobile ? 60 : 80} r={isMobile ? 52 : 72} stroke="#FFD1DC" strokeWidth="7" fill="none" />
-                      <circle cx={isMobile ? 60 : 80} cy={isMobile ? 60 : 80} r={isMobile ? 52 : 72} stroke="url(#tg)" strokeWidth="7" fill="none"
-                        strokeDasharray={`${2 * Math.PI * (isMobile ? 52 : 72)}`}
-                        strokeDashoffset={`${2 * Math.PI * (isMobile ? 52 : 72) * (1 - ((isStudying ? 25 : 5) * 60 - (timerMinutes * 60 + timerSeconds)) / ((isStudying ? 25 : 5) * 60))}`}
-                        strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.3s' }} />
+                <div className="flex justify-center mb-5 relative">
+                  <div className="relative w-40 h-40">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-100 to-purple-100 opacity-50 animate-pulse" style={{ animationDuration: '3s' }} />
+                    <svg className="w-full h-full transform -rotate-90 relative z-10">
+                      <circle cx="80" cy="80" r="72" stroke="#FFD1DC" strokeWidth="8" fill="none" />
+                      <circle cx="80" cy="80" r="72" stroke="url(#tg)" strokeWidth="8" fill="none"
+                        strokeDasharray={`${2 * Math.PI * 72}`}
+                        strokeDashoffset={`${2 * Math.PI * 72 * (1 - ((isStudying ? 25 : 5) * 60 - (timerMinutes * 60 + timerSeconds)) / ((isStudying ? 25 : 5) * 60))}`}
+                        strokeLinecap="round" className="transition-all duration-300" />
                       <defs>
                         <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%">
                           <stop offset="0%" stopColor="#FF6B9D" />
@@ -1485,88 +1213,64 @@ const StudyCafe = () => {
                         </linearGradient>
                       </defs>
                     </svg>
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                      <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: isMobile ? '28px' : '36px', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent', color: '#FF6B9D' }}>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <div className="text-4xl font-black bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
                         {formatTime(timerMinutes, timerSeconds)}
                       </div>
-                      <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
-                        {[0,0.2,0.4].map((d, i) => (
-                          <Heart key={i} style={{ width: 8, height: 8, color: i % 2 === 0 ? '#FF6B9D' : '#C86DD7', animationDelay: `${d}s` }} className="animate-pulse" />
-                        ))}
+                      <div className="flex items-center gap-1 mt-1.5">
+                        <Heart className="w-2.5 h-2.5 text-pink-400 animate-pulse" />
+                        <Heart className="w-2.5 h-2.5 text-purple-400 animate-pulse" style={{ animationDelay: '0.2s' }} />
+                        <Heart className="w-2.5 h-2.5 text-pink-400 animate-pulse" style={{ animationDelay: '0.4s' }} />
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                <div className="flex justify-center gap-2.5">
                   <button onClick={(e) => { e.stopPropagation(); setTimerMinutes(isStudying ? 25 : 5); setTimerSeconds(0); setIsRunning(false); }}
-                    style={{ background: '#FFE5F1', border: 'none', borderRadius: '12px', padding: isMobile ? '10px' : '12px', cursor: 'pointer', lineHeight: 0 }}>
-                    <RotateCcw style={{ width: isMobile ? 16 : 18, height: isMobile ? 16 : 18, color: '#FF6B9D' }} />
+                    className="p-3 rounded-2xl transition-all transform hover:scale-110 bg-pink-100 hover:bg-pink-200">
+                    <RotateCcw className="w-4 h-4 text-pink-600" />
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); setIsRunning(r => !r); }}
-                    style={{ background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', border: 'none', borderRadius: '12px', padding: isMobile ? '14px 24px' : '18px 32px', cursor: 'pointer', boxShadow: '0 8px 24px rgba(255,107,157,0.45)', lineHeight: 0, transition: 'transform 0.15s' }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                  >
-                    {isRunning ? <Pause style={{ width: isMobile ? 18 : 22, height: isMobile ? 18 : 22, color: 'white', fill: 'white' }} /> : <Play style={{ width: isMobile ? 18 : 22, height: isMobile ? 18 : 22, color: 'white', fill: 'white' }} />}
+                    className="p-5 rounded-2xl shadow-2xl transition-all transform hover:scale-110"
+                    style={{ background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' }}>
+                    {isRunning ? <Pause className="w-6 h-6 text-white" fill="white" /> : <Play className="w-6 h-6 text-white" fill="white" />}
                   </button>
                 </div>
-
-                <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#666', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                    <Sparkles style={{ width: 12, height: 12, color: '#C86DD7' }} />You got this!<Heart style={{ width: 12, height: 12, color: '#FF6B9D' }} />
+                <div className="mt-3 text-center">
+                  <p className="text-xs font-bold text-gray-600 flex items-center justify-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />You got this!<Heart className="w-3.5 h-3.5 text-pink-400" />
                   </p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* ── To-Do Widget ── */}
-          <TodoWidget isMobile={isMobile} />
+          {/* To-Do Widget — fixed bottom-right */}
+          <TodoWidget />
 
-          {/* ── Bottom Menu Bar ── */}
-          <div style={{
-            position: 'absolute',
-            bottom: isMobile ? '54px' : '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 20,
-            width: isMobile ? 'calc(100vw - 24px)' : 'auto',
-            maxWidth: isMobile ? '480px' : 'none',
-          }}>
-            {/* Music dropdown */}
+          {/* ── Bottom Menu ── */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
+
+            {/* Music dropdown — only when bar is not minimized */}
             {!isMenuBarMinimized && showMusicMenu && (
-              <div className="music-dropdown-mobile" style={{
-                marginBottom: '12px', borderRadius: '24px', padding: '16px',
-                background: 'linear-gradient(135deg, rgba(255,245,247,0.98), rgba(245,243,255,0.98))',
-                border: '3px solid rgba(255,107,157,0.3)',
-                boxShadow: '0 16px 48px rgba(255,107,157,0.3)',
-                backdropFilter: 'blur(20px)',
-                minWidth: isMobile ? 'unset' : '280px',
-                width: isMobile ? '100%' : undefined,
-                boxSizing: 'border-box',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                  <Music style={{ width: 16, height: 16, color: '#FF6B9D' }} />
-                  <h3 style={{ fontWeight: 900, fontSize: '14px', color: '#333' }}>Music Vibes 🎵</h3>
+              <div className="mb-4 rounded-3xl shadow-2xl backdrop-blur-xl border-3 p-4"
+                style={{ background: 'linear-gradient(135deg, rgba(255,245,247,0.98), rgba(245,243,255,0.98))', borderColor: 'rgba(255,107,157,0.3)', minWidth: '280px', maxWidth: '300px' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Music className="w-4 h-4 text-pink-500" />
+                  <h3 className="font-black text-sm text-gray-800">Music Vibes 🎵</h3>
                 </div>
-                <div className="music-scroll" style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px', paddingRight: '4px' }}>
+                <div className="music-scroll space-y-1.5" style={{ maxHeight: '240px', overflowY: 'auto', paddingRight: '4px' }}>
                   {musicOptions.map(music => (
                     <button key={music.id} onClick={() => {
                       setSelectedMusic(music);
                       trackEvent('music_changed', { track: music.name, buddy: selectedBuddy?.name ?? 'none' });
                     }}
-                      style={{
-                        width: '100%', padding: '10px 12px', borderRadius: '12px',
-                        border: 'none', cursor: 'pointer', textAlign: 'left',
-                        background: selectedMusic.id === music.id ? 'linear-gradient(135deg, #FF6B9D, #C86DD7)' : 'white',
-                        boxShadow: selectedMusic.id === music.id ? '0 4px 16px rgba(255,107,157,0.4)' : 'none',
-                        transition: 'all 0.15s',
-                      }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '18px' }}>{music.icon}</span>
-                        <span style={{ fontWeight: 700, fontSize: '12px', color: selectedMusic.id === music.id ? 'white' : '#333' }}>{music.name}</span>
-                        {selectedMusic.id === music.id && <Heart style={{ width: 12, height: 12, color: 'white', fill: 'white', marginLeft: 'auto' }} />}
+                      className={`w-full p-2 rounded-xl transition-all transform hover:scale-105 text-left ${selectedMusic.id === music.id ? 'text-white shadow-lg' : 'bg-white hover:bg-pink-50'}`}
+                      style={selectedMusic.id === music.id ? { background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' } : {}}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{music.icon}</span>
+                        <span className="font-bold text-xs">{music.name}</span>
+                        {selectedMusic.id === music.id && <Heart className="w-3 h-3 ml-auto fill-white" />}
                       </div>
                     </button>
                   ))}
@@ -1574,33 +1278,22 @@ const StudyCafe = () => {
               </div>
             )}
 
-            {/* Café dropdown */}
+            {/* Café dropdown — only when bar is not minimized */}
             {!isMenuBarMinimized && showCafeMenu && (
-              <div className="cafe-dropdown-mobile" style={{
-                marginBottom: '12px', borderRadius: '24px', padding: '20px',
-                background: 'linear-gradient(135deg, rgba(255,248,230,0.98), rgba(255,243,220,0.98))',
-                border: '3px solid rgba(255,165,0,0.25)',
-                boxShadow: '0 16px 48px rgba(255,165,0,0.2)',
-                backdropFilter: 'blur(20px)',
-                width: isMobile ? '100%' : '300px',
-                boxSizing: 'border-box',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                  <Coffee style={{ width: 18, height: 18, color: '#F97316' }} />
-                  <h3 style={{ fontWeight: 900, color: '#333', fontSize: '15px' }}>Café Vibes ☕</h3>
+              <div className="mb-4 rounded-3xl shadow-2xl backdrop-blur-xl border-3 p-6"
+                style={{ background: 'linear-gradient(135deg, rgba(255,248,230,0.98), rgba(255,243,220,0.98))', borderColor: 'rgba(255,165,0,0.25)', minWidth: '300px' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <Coffee className="w-5 h-5 text-orange-500" />
+                  <h3 className="font-black text-gray-800">Café Vibes ☕</h3>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                <div className="grid grid-cols-4 gap-2">
                   {cafeItems.map(item => (
                     <button key={item.id} onClick={() => toggleCafeItem(item.id)}
-                      style={{
-                        padding: '10px 6px', borderRadius: '14px', border: 'none', cursor: 'pointer',
-                        background: activeCafeItems.includes(item.id) ? 'linear-gradient(135deg, #FFD700, #FFA500)' : 'white',
-                        boxShadow: activeCafeItems.includes(item.id) ? '0 4px 12px rgba(255,165,0,0.4)' : 'none',
-                        transition: 'all 0.15s',
-                      }}>
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: '24px', marginBottom: '4px' }}>{item.emoji}</div>
-                        <div style={{ fontSize: '9px', fontWeight: 700, color: activeCafeItems.includes(item.id) ? 'white' : '#555' }}>{item.name}</div>
+                      className={`p-3 rounded-2xl transition-all transform hover:scale-105 ${activeCafeItems.includes(item.id) ? 'text-white shadow-lg' : 'bg-white hover:bg-orange-50'}`}
+                      style={activeCafeItems.includes(item.id) ? { background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' } : {}}>
+                      <div className="text-center">
+                        <div className="text-3xl mb-1">{item.emoji}</div>
+                        <div className={`text-xs font-bold ${activeCafeItems.includes(item.id) ? 'text-white' : 'text-gray-700'}`}>{item.name}</div>
                       </div>
                     </button>
                   ))}
@@ -1608,219 +1301,85 @@ const StudyCafe = () => {
               </div>
             )}
 
-            {/* Main bar */}
+            {/* ── Main bottom bar ── */}
             {isMenuBarMinimized ? (
+              /* ── Minimized pill: just shows current track name + expand button ── */
               <div
-                className="menu-bar-slide-in"
+                className="menu-bar-slide-in flex items-center gap-3 px-5 py-3 rounded-full shadow-2xl backdrop-blur-xl border-3"
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  padding: '12px 20px', borderRadius: '999px',
                   background: 'linear-gradient(135deg, rgba(255,107,157,0.95), rgba(200,109,215,0.95))',
-                  border: '2px solid rgba(255,255,255,0.3)',
-                  boxShadow: '0 8px 32px rgba(255,107,157,0.4)',
-                  backdropFilter: 'blur(16px)',
+                  borderColor: 'rgba(255,255,255,0.3)',
                 }}
               >
-                <Music style={{ width: 16, height: 16, color: 'white', opacity: 0.8 }} />
-                <span style={{ color: 'white', fontWeight: 700, fontSize: '13px', opacity: 0.9, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: isMobile ? '140px' : '200px' }}>
-                  {selectedMusic.icon} {selectedMusic.name}
-                </span>
-                <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.3)' }} />
+                <Music className="w-4 h-4 text-white opacity-80" />
+                <span className="text-white font-bold text-sm opacity-90">{selectedMusic.icon} {selectedMusic.name}</span>
+                <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.3)', margin: '0 2px' }} />
                 <button
                   onClick={() => setIsMenuBarMinimized(false)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '999px', background: 'rgba(255,255,255,0.2)', border: 'none', cursor: 'pointer', color: 'white', fontSize: '12px', fontWeight: 700 }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all transform hover:scale-105 bg-white/20 hover:bg-white/35"
+                  title="Expand controls"
                 >
-                  <ChevronUp style={{ width: 16, height: 16 }} />
-                  <span>Show</span>
+                  <ChevronUp className="w-4 h-4 text-white" />
+                  <span className="text-white text-xs font-bold">Show</span>
                 </button>
               </div>
             ) : (
+              /* ── Full expanded bar ── */
               <div
-                className="bottom-bar-full"
+                className="flex items-center gap-4 px-9 py-5 rounded-full shadow-2xl backdrop-blur-xl border-3"
                 style={{
-                  display: 'flex', alignItems: 'center',
-                  gap: isMobile ? '6px' : '16px',
-                  padding: isMobile ? '10px 12px' : '20px 36px',
-                  borderRadius: isMobile ? '20px' : '999px',
                   background: 'linear-gradient(135deg, rgba(255,107,157,0.95), rgba(200,109,215,0.95))',
-                  border: '2px solid rgba(255,255,255,0.3)',
-                  boxShadow: '0 12px 48px rgba(255,107,157,0.45)',
-                  backdropFilter: 'blur(16px)',
-                  width: isMobile ? '100%' : 'auto',
-                  boxSizing: 'border-box',
-                  justifyContent: isMobile ? 'space-between' : 'flex-start',
+                  borderColor: 'rgba(255,255,255,0.3)',
                 }}
               >
-                {/* Mute */}
-                <button onClick={() => setIsMuted(m => !m)}
-                  style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '999px', padding: isMobile ? '10px' : '12px', cursor: 'pointer', lineHeight: 0, transition: 'background 0.15s', flexShrink: 0 }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.35)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-                >
-                  {isMuted
-                    ? <VolumeX style={{ width: isMobile ? 18 : 22, height: isMobile ? 18 : 22, color: 'white' }} />
-                    : <Volume2 style={{ width: isMobile ? 18 : 22, height: isMobile ? 18 : 22, color: 'white' }} />
-                  }
+                {/* Mute toggle */}
+                <button onClick={() => setIsMuted(m => !m)} className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30">
+                  {isMuted ? <VolumeX className="w-6 h-6 text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
                 </button>
 
                 {/* Play/Pause music */}
-                <button onClick={() => setIsMusicPaused(p => !p)}
-                  style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '999px', padding: isMobile ? '10px' : '12px', cursor: 'pointer', lineHeight: 0, transition: 'background 0.15s', flexShrink: 0 }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.35)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                <button
+                  onClick={() => setIsMusicPaused(p => !p)}
+                  className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30"
+                  title={isMusicPaused ? 'Resume music' : 'Pause music'}
                 >
                   {isMusicPaused
-                    ? <Play style={{ width: isMobile ? 18 : 22, height: isMobile ? 18 : 22, color: 'white', fill: 'white' }} />
-                    : <Pause style={{ width: isMobile ? 18 : 22, height: isMobile ? 18 : 22, color: 'white', fill: 'white' }} />
+                    ? <Play className="w-6 h-6 text-white" fill="white" />
+                    : <Pause className="w-6 h-6 text-white" fill="white" />
                   }
                 </button>
 
-                {/* Music selector */}
+                {/* Music Vibes */}
                 <button
                   onClick={() => { setShowMusicMenu(s => !s); setShowCafeMenu(false); }}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    padding: isMobile ? '10px 12px' : '12px 20px',
-                    borderRadius: '999px', border: 'none', cursor: 'pointer',
-                    background: showMusicMenu ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.2)',
-                    transition: 'background 0.15s', flex: isMobile ? 1 : 'none',
-                    minWidth: 0,
-                  }}
-                >
-                  <Music style={{ width: isMobile ? 16 : 20, height: isMobile ? 16 : 20, color: 'white', flexShrink: 0 }} />
-                  {!isMobile && <span style={{ color: 'white', fontWeight: 700, fontSize: '14px', whiteSpace: 'nowrap' }}>{selectedMusic.name}</span>}
-                  {isMobile && <span style={{ color: 'white', fontWeight: 700, fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedMusic.icon}</span>}
-                  <ChevronUp style={{ width: 16, height: 16, color: 'white', transform: showMusicMenu ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
+                  className={`flex items-center gap-3 px-6 py-3 rounded-full transition transform hover:scale-105 ${showMusicMenu ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}>
+                  <Music className="w-5 h-5 text-white" />
+                  <span className="text-white font-bold text-sm">{selectedMusic.name}</span>
+                  <ChevronUp className={`w-4 h-4 text-white transition-transform duration-200 ${showMusicMenu ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Café selector */}
+                {/* Café Vibes */}
                 <button
                   onClick={() => { setShowCafeMenu(s => !s); setShowMusicMenu(false); }}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    padding: isMobile ? '10px 12px' : '12px 20px',
-                    borderRadius: '999px', border: 'none', cursor: 'pointer',
-                    background: showCafeMenu ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.2)',
-                    transition: 'background 0.15s',
-                  }}
-                >
-                  <Coffee style={{ width: isMobile ? 16 : 20, height: isMobile ? 16 : 20, color: 'white', flexShrink: 0 }} />
-                  {!isMobile && <span style={{ color: 'white', fontWeight: 700, fontSize: '14px' }}>Café Vibes</span>}
-                  <ChevronUp style={{ width: 16, height: 16, color: 'white', transform: showCafeMenu ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
+                  className={`flex items-center gap-3 px-6 py-3 rounded-full transition transform hover:scale-105 ${showCafeMenu ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}>
+                  <Coffee className="w-5 h-5 text-white" />
+                  <span className="text-white font-bold text-sm">Café Vibes</span>
+                  <ChevronUp className={`w-4 h-4 text-white transition-transform duration-200 ${showCafeMenu ? 'rotate-180' : ''}`} />
                 </button>
 
-                <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
-
-                {/* Minimize */}
+                {/* ── NEW: Minimize button ── */}
+                <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.25)', margin: '0 2px' }} />
                 <button
                   onClick={() => { setIsMenuBarMinimized(true); setShowMusicMenu(false); setShowCafeMenu(false); }}
-                  style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '999px', padding: isMobile ? '10px' : '12px', cursor: 'pointer', lineHeight: 0, transition: 'background 0.15s', flexShrink: 0 }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.35)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                  className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30"
+                  title="Minimize controls"
                 >
-                  <ChevronDown style={{ width: isMobile ? 16 : 20, height: isMobile ? 16 : 20, color: 'white' }} />
+                  <ChevronDown className="w-5 h-5 text-white" />
                 </button>
               </div>
             )}
           </div>
         </div>
-
-        {/* Mobile "coming soon" notice banner */}
-        {isMobile && (
-          <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 7500,
-            background: 'linear-gradient(135deg, rgba(255,107,157,0.97), rgba(200,109,215,0.97))',
-            borderTop: '2px solid rgba(255,255,255,0.25)',
-            padding: '8px 16px 10px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-            backdropFilter: 'blur(12px)',
-          }}>
-            <span style={{ fontSize: '14px' }}>{"✨📱"}</span>
-            <p style={{
-              fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic',
-              fontSize: '12px', color: 'white', fontWeight: 600, textAlign: 'center', lineHeight: 1.4,
-            }}>
-              Mobile coming soon {"🌸"} For the full vibe, open on Mac or laptop {"☕💖"}
-            </p>
-            <span style={{ fontSize: '14px' }}>{"💻✨"}</span>
-          </div>
-        )}
-
-        {/* ── Mobile Buddy Drawer ── */}
-        {isMobile && showMobileBuddyDrawer && (
-          <div
-            style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
-            onClick={() => setShowMobileBuddyDrawer(false)}
-          >
-            <div
-              style={{
-                position: 'absolute', bottom: 0, left: 0, right: 0,
-                background: 'linear-gradient(180deg, #FFF5F7, #F5F3FF)',
-                borderRadius: '28px 28px 0 0',
-                padding: '20px 16px 40px',
-                maxHeight: '80vh', overflowY: 'auto',
-                border: '3px solid #FFB6D9',
-                borderBottom: 'none',
-              }}
-              onClick={e => e.stopPropagation()}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Users style={{ width: 20, height: 20, color: '#FF6B9D' }} />
-                  <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '18px', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                    Switch Buddy
-                  </span>
-                </div>
-                <button onClick={() => setShowMobileBuddyDrawer(false)}
-                  style={{ background: '#FFE5F1', border: 'none', borderRadius: '10px', padding: '8px', cursor: 'pointer', lineHeight: 0 }}>
-                  <X style={{ width: 18, height: 18, color: '#FF6B9D' }} />
-                </button>
-              </div>
-
-              {/* Group filters */}
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
-                {groups.map(group => (
-                  <button key={group} onClick={() => setSelectedCategory(group)}
-                    style={{
-                      padding: '6px 12px', borderRadius: '999px', fontWeight: 700, fontSize: '11px', border: 'none', cursor: 'pointer',
-                      background: selectedCategory === group ? 'linear-gradient(135deg, #FF6B9D, #C86DD7)' : '#FFE5F1',
-                      color: selectedCategory === group ? 'white' : '#666',
-                      transition: 'all 0.15s',
-                    }}>
-                    {group === 'All' ? '✨ All' : group}
-                  </button>
-                ))}
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-                {filteredBuddies.map(buddy => (
-                  <button key={buddy.id}
-                    onClick={() => { setSelectedBuddy(buddy); setShowMobileBuddyDrawer(false); }}
-                    style={{
-                      borderRadius: '14px', overflow: 'hidden', cursor: 'pointer',
-                      background: 'white',
-                      border: selectedBuddy.id === buddy.id ? '3px solid #FF6B9D' : '2px solid #FFE0EC',
-                      boxShadow: selectedBuddy.id === buddy.id ? '0 4px 16px rgba(255,107,157,0.35)' : '0 2px 8px rgba(255,107,157,0.1)',
-                      transition: 'all 0.15s',
-                      padding: 0,
-                    }}>
-                    <img src={buddy.image} alt={buddy.name} style={{ width: '100%', height: '80px', objectFit: 'cover', display: 'block' }} />
-                    <div style={{ padding: '8px 6px' }}>
-                      <p style={{ fontWeight: 900, fontSize: '11px', color: '#333', marginBottom: '2px' }}>{buddy.name}</p>
-                      <p style={{ fontSize: '9px', fontWeight: 700, background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{buddy.group}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={() => { setSelectedBuddy(null); setShowMobileBuddyDrawer(false); }}
-                style={{ width: '100%', marginTop: '16px', padding: '14px', borderRadius: '16px', fontWeight: 900, color: 'white', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(255,107,157,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <Coffee style={{ width: 18, height: 18 }} /> Back to Café
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );
