@@ -716,7 +716,9 @@ const StudyCafe = () => {
     { id: 5, name: 'BTS Rainy Day Piano Mix',     icon: '💜', videoId: 'RdLjg7ZGxuE?si=vjNxrl1k4DQ7ziV6' },
     { id: 6, name: 'IVE Rainy Day Piano Mix',     icon: '🌹', videoId: 'LiT2sIN-Pg8?si=Vl8C_GOyept1A8ms' },
     { id: 7, name: 'Aespa Piano Mix',             icon: '🌙', videoId: '8TF58QbQTFY?si=6nzyxV_e7jzz9cKL' },
-    { id: 9, name: 'Red Velvet Lofi Mix',         icon: '🍒', videoId: 'Z6qTC5PY-u4?si=9JxJxBKmZXXG7rgV' },
+    { id: 8, name: 'Red Velvet Lofi Mix',         icon: '🍒', videoId: 'Z6qTC5PY-u4?si=9JxJxBKmZXXG7rgV' },
+    { id: 9, name: 'XLOV Instrumentals',         icon: '🖤', videoId: 'C8_e_gER1f0?si=sPKx-LIji_JJF62v' },
+  
   ];
 
   const [selectedMusic, setSelectedMusic] = useState(musicOptions[0]);
@@ -736,17 +738,20 @@ const StudyCafe = () => {
     { id: 24, name: 'Seulgi',       group: 'Red Velvet',  videoId: 'UZOnLTTiZKY?si=yeswGn2PlAAqNpgf', isPremium: false, image: 'https://cdn.i-scmp.com/sites/default/files/styles/768x768/public/images/methode/2019/02/08/35c9b9ee-2b4c-11e9-8864-9e8ab15a22ca_image_hires_125930.JPG?itok=JnlideOe&v=1549601969' },
     { id: 27, name: 'Bang Chan',    group: 'Stray Kids',  videoId: 'ANuQjiEMMcU?si=85lRUokCKtNzHBJm', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/190106_Stray_Kids_%E6%96%B9%E7%87%A6.png/250px-190106_Stray_Kids_%E6%96%B9%E7%87%A6.png' },
     { id: 28, name: 'Felix',        group: 'Stray Kids',  videoId: 'EYpwvrJlV-s?si=3BQrSp7AtwvOucAI', isPremium: false, image: 'https://external-preview.redd.it/stray-kids-felix-becomes-the-new-face-of-gong-cha-v0-Y1dU4kACbSQRpJAnGX4dI9qrjrRZMif9kS9VM06lbSw.jpg?width=640&crop=smart&auto=webp&s=e28a6c99ae4995b2fca6fbdba49386fbebcabc1f' },
-    { id: 29, name: 'Hyunjin',      group: 'Stray Kids',  videoId: 'QFfZlBdAhgs?si=dYxdJAq3oc4V6R4J', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Hyunjin_of_Stray_Kids%2C_September_24%2C_2025.png' },
-    { id: 32, name: 'Yunah',        group: 'ILLIT',       videoId: 'Kz5ie0SAPJM?si=VfoZlZkZ1t2Blwoc', isPremium: false, image: 'https://www.billboard.com/wp-content/uploads/2024/06/ILLIT-Rookie-Spotlight-YUNAH-billboard-1240.jpg?w=800' },
-    { id: 33, name: 'Wonhee',        group: 'ILLIT',       videoId: 'gY5nbjT8ZYU?si=jWYNzxoQb0eYuhmb', isPremium: false, image: 'https://yt3.googleusercontent.com/XKcAXSDCdTjZbK1L-kXT0v61K-tw6xwzPn9aMmPUdbmMW8mMygmkJswoXdlMJU7DNm_oifQ8mw=s900-c-k-c0x00ffffff-no-rj' },
-    { id: 34, name: 'Chuu',         group: 'LOONA',       videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/20251002_Chuu_%EC%B8%84_03.jpg/250px-20251002_Chuu_%EC%B8%84_03.jpg' },
-    { id: 35, name: 'Yuna',         group: 'ITZY',       videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_', isPremium: false, image: 'https://pbs.twimg.com/media/E6OrSSsWYAE-Naw.jpg' },
-    { id: 36, name: 'Key',         group: 'SHINEE',       videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP', isPremium: false, image: 'https://nolae.eu/cdn/shop/articles/key-shinee-profil-731664.jpg?v=1723729868&width=1200' },
-    { id: 37, name: 'Dahyun',         group: 'TWICE',       videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4', isPremium: false, image: 'https://i.pinimg.com/736x/44/1f/22/441f225db0f809e10a0b9abfda93cca5.jpg' },
+    { id: 29, name: 'Han',      group: 'Stray Kids',  videoId: 'TMjrez7sv5o?si=z553RJcHnTC7JXpf', isPremium: false, image: 'https://static.wikia.nocookie.net/stray-kids/images/c/c4/HAN_Profile_Picture_-_South_Korea.jpg/revision/latest?cb=20251124040034' },
+    { id: 30, name: 'Hyunjin',      group: 'Stray Kids',  videoId: 'QFfZlBdAhgs?si=dYxdJAq3oc4V6R4J', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Hyunjin_of_Stray_Kids%2C_September_24%2C_2025.png' },
+    { id: 31, name: 'Yunah',        group: 'ILLIT',       videoId: 'Kz5ie0SAPJM?si=VfoZlZkZ1t2Blwoc', isPremium: false, image: 'https://www.billboard.com/wp-content/uploads/2024/06/ILLIT-Rookie-Spotlight-YUNAH-billboard-1240.jpg?w=800' },
+    { id: 32, name: 'Wonhee',        group: 'ILLIT',       videoId: 'gY5nbjT8ZYU?si=jWYNzxoQb0eYuhmb', isPremium: false, image: 'https://yt3.googleusercontent.com/XKcAXSDCdTjZbK1L-kXT0v61K-tw6xwzPn9aMmPUdbmMW8mMygmkJswoXdlMJU7DNm_oifQ8mw=s900-c-k-c0x00ffffff-no-rj' },
+    { id: 33, name: 'Chuu',         group: 'LOONA',       videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc', isPremium: false, image: 'https://static.wikia.nocookie.net/loonatheworld/images/8/8f/1200_Promotional_Picture_Chuu.png/revision/latest?cb=20201001213955' },
+    { id: 34, name: 'Yuna',         group: 'ITZY',       videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_', isPremium: false, image: 'https://pbs.twimg.com/media/E6OrSSsWYAE-Naw.jpg' },
+    { id: 35, name: 'Key',         group: 'SHINEE',       videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP', isPremium: false, image: 'https://nolae.eu/cdn/shop/articles/key-shinee-profil-731664.jpg?v=1723729868&width=1200' },
+    { id: 36, name: 'Dahyun',         group: 'TWICE',       videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4', isPremium: false, image: 'https://i.pinimg.com/736x/44/1f/22/441f225db0f809e10a0b9abfda93cca5.jpg' },
+    { id: 37, name: 'Yuqi',         group: 'G-IDLE',       videoId: 'gKIGXBkW56Y?si=vP0xmCSwLFDJD9Fq', isPremium: false, image: 'https://external-preview.redd.it/231016-official-update-yuqi-on-star-of-star-girls-v0-cPdL1Wl6mbHAWjHnatUUhlDUCVUsmVTibuqTseTjQxQ.jpg?auto=webp&s=53fa9f7fd7c5b2ad148b1d0137720030f5a2c8bf' },
+    { id: 38, name: 'Lily',         group: 'NMIXX',       videoId: 'HMIUqdzm0bs?si=GXJ55DuQRMVyvgcv', isPremium: false, image: 'https://preview.redd.it/230520-nmixx-instagram-update-lily-v0-fy1fccexmw0b1.jpg?width=640&crop=smart&auto=webp&s=86e4ba4ea288e64a286fb8d6176e5652be57e02f' },
 
   ];
 
-  const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA', 'ITZY', 'TWICE', 'SHINEE'];
+  const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA', 'ITZY', 'TWICE', 'SHINEE', 'G-IDLE', 'NMIXX'];
 
   const showToast = (message, emoji, subtext) => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
