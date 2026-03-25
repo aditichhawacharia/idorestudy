@@ -70,6 +70,14 @@ const fontStyle = `
     animation: menuBarSlideIn 0.3s cubic-bezier(0.34,1.2,0.64,1) forwards;
   }
 
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  .timer-settings-modal {
+    animation: modalFadeIn 0.25s cubic-bezier(0.34,1.2,0.64,1) forwards;
+  }
+
   .music-scroll::-webkit-scrollbar {
     width: 4px;
   }
@@ -82,6 +90,253 @@ const fontStyle = `
     border-radius: 99px;
   }
 `;
+
+// ── Timer Settings Storage Key ────────────────────────────────────────────────
+const TIMER_SETTINGS_KEY = 'idorestudy_timer_settings_v1';
+
+function loadTimerSettings() {
+  try {
+    const saved = localStorage.getItem(TIMER_SETTINGS_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (
+        typeof parsed.studyMinutes === 'number' && parsed.studyMinutes >= 1 && parsed.studyMinutes <= 120 &&
+        typeof parsed.breakMinutes === 'number' && parsed.breakMinutes >= 1 && parsed.breakMinutes <= 60
+      ) {
+        return parsed;
+      }
+    }
+  } catch (e) {}
+  return { studyMinutes: 25, breakMinutes: 5 };
+}
+
+function saveTimerSettings(settings) {
+  try { localStorage.setItem(TIMER_SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {}
+}
+
+// ── Timer Settings Modal ──────────────────────────────────────────────────────
+function TimerSettingsModal({ visible, onClose, onSave, currentStudy, currentBreak }) {
+  const [studyVal, setStudyVal] = useState(currentStudy);
+  const [breakVal, setBreakVal] = useState(currentBreak);
+  const [studyErr, setStudyErr] = useState('');
+  const [breakErr, setBreakErr] = useState('');
+
+  useEffect(() => {
+    if (visible) {
+      setStudyVal(currentStudy);
+      setBreakVal(currentBreak);
+      setStudyErr('');
+      setBreakErr('');
+    }
+  }, [visible, currentStudy, currentBreak]);
+
+  if (!visible) return null;
+
+  const validate = () => {
+    let ok = true;
+    const s = parseInt(studyVal, 10);
+    const b = parseInt(breakVal, 10);
+    if (isNaN(s) || s < 1 || s > 120) { setStudyErr('Enter a value between 1–120 min'); ok = false; } else setStudyErr('');
+    if (isNaN(b) || b < 1 || b > 60)  { setBreakErr('Enter a value between 1–60 min');  ok = false; } else setBreakErr('');
+    return ok ? { studyMinutes: s, breakMinutes: b } : null;
+  };
+
+  const handleSave = () => {
+    const result = validate();
+    if (result) onSave(result);
+  };
+
+  const presets = [
+    { label: '25 / 5', study: 25, brk: 5 },
+    { label: '50 / 10', study: 50, brk: 10 },
+    { label: '90 / 20', study: 90, brk: 20 },
+    { label: '45 / 15', study: 45, brk: 15 },
+  ];
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 99998,
+      background: 'rgba(0,0,0,0.45)',
+      backdropFilter: 'blur(8px)',
+    }} onClick={onClose}>
+      <div
+        className="timer-settings-modal"
+        onClick={e => e.stopPropagation()}
+        style={{
+          position: 'fixed', top: '50%', left: '50%',
+          background: 'linear-gradient(135deg, #FFF5F7 0%, #F5F3FF 50%, #FFF0F5 100%)',
+          border: '4px solid #FFB6D9',
+          borderRadius: '32px',
+          padding: '36px 40px',
+          width: '380px',
+          boxShadow: '0 32px 100px rgba(255,107,157,0.45)',
+          zIndex: 1,
+        }}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 12, background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Settings style={{ width: 18, height: 18, color: 'white' }} />
+            </div>
+            <div>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '20px', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.1 }}>
+                Timer Settings
+              </h2>
+              <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '13px', color: '#B8A0CC', fontWeight: 300 }}>
+                Saved to your device ✨
+              </p>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6 }}>
+            <X style={{ width: 18, height: 18, color: '#C4A8D4' }} />
+          </button>
+        </div>
+
+        {/* Quick presets */}
+        <div style={{ marginBottom: '24px' }}>
+          <p style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '12px', color: '#9B7EDB', letterSpacing: '0.08em', marginBottom: '10px', textTransform: 'uppercase' }}>
+            Quick Presets
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            {presets.map(p => (
+              <button
+                key={p.label}
+                onClick={() => { setStudyVal(p.study); setBreakVal(p.brk); setStudyErr(''); setBreakErr(''); }}
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: '14px',
+                  border: `2px solid ${studyVal === p.study && breakVal === p.brk ? '#FF6B9D' : '#FFD7E5'}`,
+                  background: studyVal === p.study && breakVal === p.brk
+                    ? 'linear-gradient(135deg, rgba(255,107,157,0.12), rgba(200,109,215,0.12))'
+                    : 'white',
+                  cursor: 'pointer',
+                  transition: 'all 0.18s',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}
+                onMouseEnter={e => { if (!(studyVal === p.study && breakVal === p.brk)) e.currentTarget.style.borderColor = '#FFB6D9'; }}
+                onMouseLeave={e => { if (!(studyVal === p.study && breakVal === p.brk)) e.currentTarget.style.borderColor = '#FFD7E5'; }}
+              >
+                <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '15px', background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  {p.label}
+                </span>
+                <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '11px', color: '#C4A8D4' }}>
+                  min
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Custom inputs */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+          {/* Study time */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '13px', color: '#FF6B9D', marginBottom: '8px' }}>
+              <span>📚</span> Study Duration (minutes)
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                onClick={() => setStudyVal(v => Math.max(1, (parseInt(v, 10) || 25) - 1))}
+                style={{ width: 36, height: 36, borderRadius: '10px', border: '2px solid #FFD7E5', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '18px', color: '#FF6B9D', flexShrink: 0, transition: 'all 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#FF6B9D'; e.currentTarget.style.background = '#FFF5F7'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#FFD7E5'; e.currentTarget.style.background = 'white'; }}
+              >−</button>
+              <input
+                type="number" min="1" max="120"
+                value={studyVal}
+                onChange={e => setStudyVal(e.target.value)}
+                style={{
+                  flex: 1, padding: '10px 14px', borderRadius: '12px',
+                  border: `2px solid ${studyErr ? '#FF3B6B' : '#FFD7E5'}`,
+                  outline: 'none', fontSize: '16px', fontWeight: 900,
+                  fontFamily: "'Playfair Display', serif",
+                  textAlign: 'center', color: '#444', background: 'white',
+                  transition: 'border-color 0.15s',
+                }}
+                onFocus={e => e.target.style.borderColor = '#FF6B9D'}
+                onBlur={e => e.target.style.borderColor = studyErr ? '#FF3B6B' : '#FFD7E5'}
+              />
+              <button
+                onClick={() => setStudyVal(v => Math.min(120, (parseInt(v, 10) || 25) + 1))}
+                style={{ width: 36, height: 36, borderRadius: '10px', border: '2px solid #FFD7E5', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '18px', color: '#FF6B9D', flexShrink: 0, transition: 'all 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#FF6B9D'; e.currentTarget.style.background = '#FFF5F7'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#FFD7E5'; e.currentTarget.style.background = 'white'; }}
+              >+</button>
+            </div>
+            {studyErr && <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '12px', color: '#FF3B6B', marginTop: '5px' }}>{studyErr}</p>}
+          </div>
+
+          {/* Break time */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '13px', color: '#C86DD7', marginBottom: '8px' }}>
+              <span>☕</span> Break Duration (minutes)
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                onClick={() => setBreakVal(v => Math.max(1, (parseInt(v, 10) || 5) - 1))}
+                style={{ width: 36, height: 36, borderRadius: '10px', border: '2px solid #FFD7E5', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '18px', color: '#C86DD7', flexShrink: 0, transition: 'all 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#C86DD7'; e.currentTarget.style.background = '#F5F3FF'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#FFD7E5'; e.currentTarget.style.background = 'white'; }}
+              >−</button>
+              <input
+                type="number" min="1" max="60"
+                value={breakVal}
+                onChange={e => setBreakVal(e.target.value)}
+                style={{
+                  flex: 1, padding: '10px 14px', borderRadius: '12px',
+                  border: `2px solid ${breakErr ? '#FF3B6B' : '#FFD7E5'}`,
+                  outline: 'none', fontSize: '16px', fontWeight: 900,
+                  fontFamily: "'Playfair Display', serif",
+                  textAlign: 'center', color: '#444', background: 'white',
+                  transition: 'border-color 0.15s',
+                }}
+                onFocus={e => e.target.style.borderColor = '#C86DD7'}
+                onBlur={e => e.target.style.borderColor = breakErr ? '#FF3B6B' : '#FFD7E5'}
+              />
+              <button
+                onClick={() => setBreakVal(v => Math.min(60, (parseInt(v, 10) || 5) + 1))}
+                style={{ width: 36, height: 36, borderRadius: '10px', border: '2px solid #FFD7E5', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '18px', color: '#C86DD7', flexShrink: 0, transition: 'all 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#C86DD7'; e.currentTarget.style.background = '#F5F3FF'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#FFD7E5'; e.currentTarget.style.background = 'white'; }}
+              >+</button>
+            </div>
+            {breakErr && <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '12px', color: '#FF3B6B', marginTop: '5px' }}>{breakErr}</p>}
+          </div>
+        </div>
+
+        {/* Save button */}
+        <button
+          onClick={handleSave}
+          style={{
+            width: '100%',
+            padding: '16px',
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)',
+            border: 'none',
+            color: 'white',
+            fontFamily: "'Playfair Display', serif",
+            fontWeight: 900,
+            fontSize: '16px',
+            cursor: 'pointer',
+            boxShadow: '0 8px 28px rgba(255,107,157,0.4)',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(255,107,157,0.55)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(255,107,157,0.4)'; }}
+        >
+          <Heart style={{ width: 16, height: 16, fill: 'white' }} />
+          Save My Timer Settings
+        </button>
+
+        <p style={{ textAlign: 'center', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '12px', color: '#C4A8D4', marginTop: '14px' }}>
+          Settings are saved to this device automatically 🌸
+        </p>
+      </div>
+    </div>
+  );
+}
 
 // ── YouTube Background ────────────────────────────────────────────────────────
 function YTBackground({ videoId }) {
@@ -129,7 +384,6 @@ function AudioPlayer({ videoId, isMuted, isPaused }) {
     }
   }, [newClean]);
 
-  // Send play/pause command via postMessage
   useEffect(() => {
     if (!loaded || !iframeRef.current) return;
     try {
@@ -140,7 +394,6 @@ function AudioPlayer({ videoId, isMuted, isPaused }) {
     } catch (e) {}
   }, [isPaused, loaded]);
 
-  // FIX: Send mute/unmute command via postMessage — fires every time isMuted changes
   useEffect(() => {
     if (!loaded || !iframeRef.current) return;
     const func = isMuted ? 'mute' : 'unMute';
@@ -152,15 +405,12 @@ function AudioPlayer({ videoId, isMuted, isPaused }) {
     } catch (e) {}
   }, [isMuted, loaded]);
 
-  // FIX: After iframe loads, immediately sync the current mute state
   const handleLoad = () => {
     setLoaded(true);
   };
 
-  // FIX: After loaded state changes to true, sync mute state
   useEffect(() => {
     if (!loaded || !iframeRef.current) return;
-    // Small delay to ensure YT API is ready after load
     const t = setTimeout(() => {
       try {
         iframeRef.current.contentWindow.postMessage(
@@ -218,7 +468,6 @@ function TimerSound({ shouldPlay, onDone }) {
           osc.stop(startTime + duration);
         };
 
-        // Pleasant 3-tone café bell chime × 2
         const t = ctx.currentTime;
         playBeep(880,  t,        0.55);
         playBeep(1100, t + 0.35, 0.55);
@@ -229,7 +478,6 @@ function TimerSound({ shouldPlay, onDone }) {
 
         setTimeout(() => { if (onDone) onDone(); ctx.close(); }, 3500);
       } catch (e) {
-        // Web Audio not supported — just dismiss
         setTimeout(() => { if (onDone) onDone(); }, 100);
       }
     }
@@ -407,7 +655,6 @@ function TodoWidget() {
       alignItems: 'flex-end',
       gap: '10px',
     }}>
-      {/* Expanded panel */}
       {isOpen && !isMinimized && (
         <div className="todo-slide-in" style={{
           background: 'linear-gradient(135deg, rgba(255,245,247,0.99), rgba(245,243,255,0.99))',
@@ -417,7 +664,6 @@ function TodoWidget() {
           boxShadow: '0 24px 80px rgba(255,107,157,0.32)',
           backdropFilter: 'blur(20px)',
         }}>
-          {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '22px' }}>📝</span>
@@ -435,7 +681,6 @@ function TodoWidget() {
             </div>
           </div>
 
-          {/* Progress */}
           {total > 0 && (
             <div style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
@@ -450,7 +695,6 @@ function TodoWidget() {
             </div>
           )}
 
-          {/* Items */}
           <div style={{ maxHeight: '220px', overflowY: 'auto', marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '7px' }}>
             {todos.length === 0 && (
               <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', color: '#C4A8D4', fontSize: '14px', textAlign: 'center', padding: '18px 0' }}>
@@ -483,7 +727,6 @@ function TodoWidget() {
             ))}
           </div>
 
-          {/* Add input */}
           <div style={{ display: 'flex', gap: '8px' }}>
             <input
               ref={inputRef}
@@ -516,7 +759,6 @@ function TodoWidget() {
         </div>
       )}
 
-      {/* Minimized bar */}
       {isOpen && isMinimized && (
         <div className="todo-slide-in" style={{
           background: 'linear-gradient(135deg, rgba(255,245,247,0.99), rgba(245,243,255,0.99))',
@@ -539,7 +781,6 @@ function TodoWidget() {
         </div>
       )}
 
-      {/* FAB button */}
       <button
         onClick={() => { setIsOpen(o => !o); setIsMinimized(false); }}
         style={{
@@ -558,7 +799,6 @@ function TodoWidget() {
         title="To-Do List"
       >
         {isOpen ? <X style={{ width: 22, height: 22, color: 'white' }} /> : <CheckSquare style={{ width: 22, height: 22, color: 'white' }} />}
-        {/* Badge */}
         {!isOpen && total > 0 && done < total && (
           <div style={{
             position: 'absolute', top: '-4px', right: '-4px',
@@ -594,7 +834,12 @@ function trackEvent(name, params = {}) {
 // ── Main App ──────────────────────────────────────────────────────────────────
 const StudyCafe = () => {
   const [selectedBuddy, setSelectedBuddy] = useState(null);
-  const [timerMinutes, setTimerMinutes] = useState(25);
+
+  // ── Load persisted timer settings ────────────────────────────────────────────
+  const [timerSettings, setTimerSettings] = useState(loadTimerSettings);
+  const [showTimerSettings, setShowTimerSettings] = useState(false);
+
+  const [timerMinutes, setTimerMinutes] = useState(timerSettings.studyMinutes);
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [isStudying, setIsStudying] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
@@ -613,11 +858,27 @@ const StudyCafe = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isTimerMinimized, setIsTimerMinimized] = useState(false);
-  // ── NEW: bottom menu bar minimized state ──────────────────────────────────
   const [isMenuBarMinimized, setIsMenuBarMinimized] = useState(false);
   const timerRef = useRef(null);
 
-  // ── Analytics: track time spent on page ──────────────────────────────────────
+  // ── Handle saving new timer settings ─────────────────────────────────────────
+  const handleSaveTimerSettings = (newSettings) => {
+    saveTimerSettings(newSettings);
+    setTimerSettings(newSettings);
+    setShowTimerSettings(false);
+    // Reset timer to new study duration if not running
+    if (!isRunning) {
+      if (isStudying) {
+        setTimerMinutes(newSettings.studyMinutes);
+        setTimerSeconds(0);
+      } else {
+        setTimerMinutes(newSettings.breakMinutes);
+        setTimerSeconds(0);
+      }
+    }
+    showToast('Timer updated! 🎉', '⏱️', `Study: ${newSettings.studyMinutes}min · Break: ${newSettings.breakMinutes}min`);
+  };
+
   const sessionStartRef = useRef(Date.now());
   const selectedBuddyRef = useRef(null);
 
@@ -675,20 +936,17 @@ const StudyCafe = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reclaim focus from YouTube iframes
   useEffect(() => {
     const reclaim = () => { setTimeout(() => { try { window.focus(); } catch (e) {} }, 50); };
     window.addEventListener('blur', reclaim);
     return () => window.removeEventListener('blur', reclaim);
   }, []);
 
-  // Track buddy selection
   useEffect(() => {
     if (!selectedBuddy) return;
     trackEvent('select_buddy', { buddy: selectedBuddy.name, group: selectedBuddy.group });
   }, [selectedBuddy?.id]);
 
-  // Track timer start/stop
   useEffect(() => {
     if (isRunning) {
       trackEvent('timer_start', { type: isStudying ? 'study' : 'break', buddy: selectedBuddy?.name ?? 'none' });
@@ -718,7 +976,6 @@ const StudyCafe = () => {
     { id: 7, name: 'Aespa Piano Mix',             icon: '🌙', videoId: '8TF58QbQTFY?si=6nzyxV_e7jzz9cKL' },
     { id: 8, name: 'Red Velvet Lofi Mix',         icon: '🍒', videoId: 'Z6qTC5PY-u4?si=9JxJxBKmZXXG7rgV' },
     { id: 9, name: 'XLOV Instrumentals',         icon: '🖤', videoId: 'C8_e_gER1f0?si=sPKx-LIji_JJF62v' },
-  
   ];
 
   const [selectedMusic, setSelectedMusic] = useState(musicOptions[0]);
@@ -742,13 +999,12 @@ const StudyCafe = () => {
     { id: 30, name: 'Hyunjin',      group: 'Stray Kids',  videoId: 'QFfZlBdAhgs?si=dYxdJAq3oc4V6R4J', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Hyunjin_of_Stray_Kids%2C_September_24%2C_2025.png' },
     { id: 31, name: 'Yunah',        group: 'ILLIT',       videoId: 'Kz5ie0SAPJM?si=VfoZlZkZ1t2Blwoc', isPremium: false, image: 'https://www.billboard.com/wp-content/uploads/2024/06/ILLIT-Rookie-Spotlight-YUNAH-billboard-1240.jpg?w=800' },
     { id: 32, name: 'Wonhee',        group: 'ILLIT',       videoId: 'gY5nbjT8ZYU?si=jWYNzxoQb0eYuhmb', isPremium: false, image: 'https://yt3.googleusercontent.com/XKcAXSDCdTjZbK1L-kXT0v61K-tw6xwzPn9aMmPUdbmMW8mMygmkJswoXdlMJU7DNm_oifQ8mw=s900-c-k-c0x00ffffff-no-rj' },
-    { id: 33, name: 'Chuu',         group: 'LOONA',       videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc', isPremium: false, image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/220628_%EC%9D%B4%EB%8B%AC%EC%9D%98_%EC%86%8C%EB%85%80_%EC%B8%84_%283%29.jpg/250px-220628_%EC%9D%B4%EB%8B%AC%EC%9D%98_%EC%86%8C%EB%85%80_%EC%B8%84_%283%29.jpg' },
+    { id: 33, name: 'Chuu',         group: 'LOONA',       videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc', isPremium: false, image: 'https://i.pinimg.com/236x/61/ca/c0/61cac0fbfccbc41b5137cb87bb03fd00.jpg' },
     { id: 34, name: 'Yuna',         group: 'ITZY',       videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_', isPremium: false, image: 'https://pbs.twimg.com/media/E6OrSSsWYAE-Naw.jpg' },
     { id: 35, name: 'Key',         group: 'SHINEE',       videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP', isPremium: false, image: 'https://nolae.eu/cdn/shop/articles/key-shinee-profil-731664.jpg?v=1723729868&width=1200' },
     { id: 36, name: 'Dahyun',         group: 'TWICE',       videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4', isPremium: false, image: 'https://i.pinimg.com/736x/44/1f/22/441f225db0f809e10a0b9abfda93cca5.jpg' },
     { id: 37, name: 'Yuqi',         group: 'G-IDLE',       videoId: 'gKIGXBkW56Y?si=vP0xmCSwLFDJD9Fq', isPremium: false, image: 'https://external-preview.redd.it/231016-official-update-yuqi-on-star-of-star-girls-v0-cPdL1Wl6mbHAWjHnatUUhlDUCVUsmVTibuqTseTjQxQ.jpg?auto=webp&s=53fa9f7fd7c5b2ad148b1d0137720030f5a2c8bf' },
     { id: 38, name: 'Lily',         group: 'NMIXX',       videoId: 'HMIUqdzm0bs?si=GXJ55DuQRMVyvgcv', isPremium: false, image: 'https://preview.redd.it/230520-nmixx-instagram-update-lily-v0-fy1fccexmw0b1.jpg?width=640&crop=smart&auto=webp&s=86e4ba4ea288e64a286fb8d6176e5652be57e02f' },
-
   ];
 
   const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA', 'ITZY', 'TWICE', 'SHINEE', 'G-IDLE', 'NMIXX'];
@@ -778,29 +1034,27 @@ const StudyCafe = () => {
             setPlayTimerSound(true);
             setIsMusicPaused(true);
             if (isStudying) {
-              // ── NEW: track study session completion event ──
               trackEvent('timer_complete', {
                 type: 'study',
-                duration_minutes: 25,
+                duration_minutes: timerSettings.studyMinutes,
                 buddy: selectedBuddy?.name ?? 'none',
                 group: selectedBuddy?.group ?? 'none',
                 music: selectedMusic?.name ?? 'none',
               });
               fireBrowserNotification('Study Session Complete! 🎉', 'Great job! Time for a café break ☕');
               setTimerDoneNotif({ visible: true, wasStudying: true });
-              setTimerMinutes(5); setTimerSeconds(0); setIsStudying(false);
+              setTimerMinutes(timerSettings.breakMinutes); setTimerSeconds(0); setIsStudying(false);
             } else {
-              // ── NEW: track break session completion event ──
               trackEvent('timer_complete', {
                 type: 'break',
-                duration_minutes: 5,
+                duration_minutes: timerSettings.breakMinutes,
                 buddy: selectedBuddy?.name ?? 'none',
                 group: selectedBuddy?.group ?? 'none',
                 music: selectedMusic?.name ?? 'none',
               });
               fireBrowserNotification("Break Time Over!", "Ready to study again? Let's go! 📚");
               setTimerDoneNotif({ visible: true, wasStudying: false });
-              setTimerMinutes(25); setTimerSeconds(0); setIsStudying(true);
+              setTimerMinutes(timerSettings.studyMinutes); setTimerSeconds(0); setIsStudying(true);
             }
             return;
           }
@@ -811,15 +1065,13 @@ const StudyCafe = () => {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isRunning, timerMinutes, timerSeconds, isStudying]);
+  }, [isRunning, timerMinutes, timerSeconds, isStudying, timerSettings]);
 
-  // Dismiss notif → resume music
   const handleTimerNotifDismiss = () => {
     setTimerDoneNotif({ visible: false, wasStudying: true });
     setIsMusicPaused(false);
   };
 
-  // Timer drag
   const handleMouseDown = (e) => {
     if (e.target.closest('button')) return;
     setIsDragging(true);
@@ -1044,6 +1296,15 @@ const StudyCafe = () => {
           onDone={() => setPlayTimerSound(false)}
         />
 
+        {/* ── Timer Settings Modal ── */}
+        <TimerSettingsModal
+          visible={showTimerSettings}
+          onClose={() => setShowTimerSettings(false)}
+          onSave={handleSaveTimerSettings}
+          currentStudy={timerSettings.studyMinutes}
+          currentBreak={timerSettings.breakMinutes}
+        />
+
         {/* Left Sidebar */}
         <div className={`transition-all duration-300 ${showSidebar ? 'w-80' : 'w-0'} flex-shrink-0 overflow-hidden`}
           style={{ background: 'linear-gradient(180deg, #FFF5F7 0%, #F5F3FF 50%, #FFF0F5 100%)', borderRight: '4px solid #FFB6D9' }}>
@@ -1184,18 +1445,37 @@ const StudyCafe = () => {
                       className="p-1.5 hover:bg-pink-100 rounded-xl transition">
                       <Minimize2 className="w-3.5 h-3.5 text-gray-600" />
                     </button>
-                    <button className="p-1.5 hover:bg-pink-100 rounded-xl transition">
+                    {/* ── Settings button now opens timer settings modal ── */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setShowTimerSettings(true); }}
+                      className="p-1.5 hover:bg-pink-100 rounded-xl transition"
+                      title="Customize timer durations"
+                    >
                       <Settings className="w-3.5 h-3.5 text-gray-600" />
                     </button>
                   </div>
                 </div>
+
+                {/* ── Current settings hint ── */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '10px' }}>
+                  <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '11px', color: '#B8A0CC', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    📚 {timerSettings.studyMinutes}m &nbsp;·&nbsp; ☕ {timerSettings.breakMinutes}m
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setShowTimerSettings(true); }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 5px', borderRadius: '6px', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '11px', color: '#FF6B9D', fontWeight: 600, transition: 'background 0.15s' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#FFE5F1'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                    >edit</button>
+                  </span>
+                </div>
+
                 <div className="flex gap-2 mb-5">
-                  <button onClick={(e) => { e.stopPropagation(); setIsStudying(true); setTimerMinutes(25); setTimerSeconds(0); setIsRunning(false); }}
+                  <button onClick={(e) => { e.stopPropagation(); setIsStudying(true); setTimerMinutes(timerSettings.studyMinutes); setTimerSeconds(0); setIsRunning(false); }}
                     className={`flex-1 py-2.5 rounded-2xl font-bold text-xs transition-all transform hover:scale-105 ${isStudying ? 'text-white shadow-xl scale-105' : 'hover:bg-pink-50'}`}
                     style={isStudying ? { background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' } : { backgroundColor: '#FFE5F1', color: '#9CA3AF' }}>
                     📚 Study
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); setIsStudying(false); setTimerMinutes(5); setTimerSeconds(0); setIsRunning(false); }}
+                  <button onClick={(e) => { e.stopPropagation(); setIsStudying(false); setTimerMinutes(timerSettings.breakMinutes); setTimerSeconds(0); setIsRunning(false); }}
                     className={`flex-1 py-2.5 rounded-2xl font-bold text-xs transition-all transform hover:scale-105 ${!isStudying ? 'text-white shadow-xl scale-105' : 'hover:bg-pink-50'}`}
                     style={!isStudying ? { background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' } : { backgroundColor: '#FFE5F1', color: '#9CA3AF' }}>
                     ☕ Break
@@ -1208,7 +1488,7 @@ const StudyCafe = () => {
                       <circle cx="80" cy="80" r="72" stroke="#FFD1DC" strokeWidth="8" fill="none" />
                       <circle cx="80" cy="80" r="72" stroke="url(#tg)" strokeWidth="8" fill="none"
                         strokeDasharray={`${2 * Math.PI * 72}`}
-                        strokeDashoffset={`${2 * Math.PI * 72 * (1 - ((isStudying ? 25 : 5) * 60 - (timerMinutes * 60 + timerSeconds)) / ((isStudying ? 25 : 5) * 60))}`}
+                        strokeDashoffset={`${2 * Math.PI * 72 * (1 - ((isStudying ? timerSettings.studyMinutes : timerSettings.breakMinutes) * 60 - (timerMinutes * 60 + timerSeconds)) / ((isStudying ? timerSettings.studyMinutes : timerSettings.breakMinutes) * 60))}`}
                         strokeLinecap="round" className="transition-all duration-300" />
                       <defs>
                         <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1231,7 +1511,7 @@ const StudyCafe = () => {
                   </div>
                 </div>
                 <div className="flex justify-center gap-2.5">
-                  <button onClick={(e) => { e.stopPropagation(); setTimerMinutes(isStudying ? 25 : 5); setTimerSeconds(0); setIsRunning(false); }}
+                  <button onClick={(e) => { e.stopPropagation(); setTimerMinutes(isStudying ? timerSettings.studyMinutes : timerSettings.breakMinutes); setTimerSeconds(0); setIsRunning(false); }}
                     className="p-3 rounded-2xl transition-all transform hover:scale-110 bg-pink-100 hover:bg-pink-200">
                     <RotateCcw className="w-4 h-4 text-pink-600" />
                   </button>
@@ -1256,7 +1536,6 @@ const StudyCafe = () => {
           {/* ── Bottom Menu ── */}
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
 
-            {/* Music dropdown — only when bar is not minimized */}
             {!isMenuBarMinimized && showMusicMenu && (
               <div className="mb-4 rounded-3xl shadow-2xl backdrop-blur-xl border-3 p-4"
                 style={{ background: 'linear-gradient(135deg, rgba(255,245,247,0.98), rgba(245,243,255,0.98))', borderColor: 'rgba(255,107,157,0.3)', minWidth: '280px', maxWidth: '300px' }}>
@@ -1283,7 +1562,6 @@ const StudyCafe = () => {
               </div>
             )}
 
-            {/* Café dropdown — only when bar is not minimized */}
             {!isMenuBarMinimized && showCafeMenu && (
               <div className="mb-4 rounded-3xl shadow-2xl backdrop-blur-xl border-3 p-6"
                 style={{ background: 'linear-gradient(135deg, rgba(255,248,230,0.98), rgba(255,243,220,0.98))', borderColor: 'rgba(255,165,0,0.25)', minWidth: '300px' }}>
@@ -1308,7 +1586,6 @@ const StudyCafe = () => {
 
             {/* ── Main bottom bar ── */}
             {isMenuBarMinimized ? (
-              /* ── Minimized pill: just shows current track name + expand button ── */
               <div
                 className="menu-bar-slide-in flex items-center gap-3 px-5 py-3 rounded-full shadow-2xl backdrop-blur-xl border-3"
                 style={{
@@ -1329,7 +1606,6 @@ const StudyCafe = () => {
                 </button>
               </div>
             ) : (
-              /* ── Full expanded bar ── */
               <div
                 className="flex items-center gap-4 px-9 py-5 rounded-full shadow-2xl backdrop-blur-xl border-3"
                 style={{
@@ -1337,12 +1613,10 @@ const StudyCafe = () => {
                   borderColor: 'rgba(255,255,255,0.3)',
                 }}
               >
-                {/* Mute toggle */}
                 <button onClick={() => setIsMuted(m => !m)} className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30">
                   {isMuted ? <VolumeX className="w-6 h-6 text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
                 </button>
 
-                {/* Play/Pause music */}
                 <button
                   onClick={() => setIsMusicPaused(p => !p)}
                   className="p-3 rounded-full transition transform hover:scale-110 bg-white/20 hover:bg-white/30"
@@ -1354,7 +1628,6 @@ const StudyCafe = () => {
                   }
                 </button>
 
-                {/* Music Vibes */}
                 <button
                   onClick={() => { setShowMusicMenu(s => !s); setShowCafeMenu(false); }}
                   className={`flex items-center gap-3 px-6 py-3 rounded-full transition transform hover:scale-105 ${showMusicMenu ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}>
@@ -1363,7 +1636,6 @@ const StudyCafe = () => {
                   <ChevronUp className={`w-4 h-4 text-white transition-transform duration-200 ${showMusicMenu ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Café Vibes */}
                 <button
                   onClick={() => { setShowCafeMenu(s => !s); setShowMusicMenu(false); }}
                   className={`flex items-center gap-3 px-6 py-3 rounded-full transition transform hover:scale-105 ${showCafeMenu ? 'bg-white/40' : 'bg-white/20 hover:bg-white/30'}`}>
@@ -1372,7 +1644,6 @@ const StudyCafe = () => {
                   <ChevronUp className={`w-4 h-4 text-white transition-transform duration-200 ${showCafeMenu ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* ── NEW: Minimize button ── */}
                 <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.25)', margin: '0 2px' }} />
                 <button
                   onClick={() => { setIsMenuBarMinimized(true); setShowMusicMenu(false); setShowCafeMenu(false); }}
