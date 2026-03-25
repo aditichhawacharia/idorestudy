@@ -977,6 +977,7 @@ const StudyCafe = () => {
     { id: 8, name: 'Red Velvet Lofi Mix',         icon: '🍒', videoId: 'Z6qTC5PY-u4?si=9JxJxBKmZXXG7rgV' },
     { id: 9, name: 'XLOV Instrumentals',         icon: '🖤', videoId: 'C8_e_gER1f0?si=sPKx-LIji_JJF62v' },
     { id: 10, name: 'ILLIT Instrumentals',         icon: '⭐', videoId: 'BTlZZu-SoAI?si=Q_uQHu9vW3KCJeD6' },
+    { id: 11, name: 'Enhypen Moonstruck Orchestral',   icon: '🌙', videoId: 'yCq9AHVFNKA?si=lqpt13-Fg-NU9KND' },
 
   ];
 
@@ -1010,10 +1011,11 @@ const StudyCafe = () => {
     { id: 39, name: 'Yuqi',         group: 'G-IDLE',       videoId: 'gKIGXBkW56Y?si=vP0xmCSwLFDJD9Fq', isPremium: false, image: 'https://external-preview.redd.it/231016-official-update-yuqi-on-star-of-star-girls-v0-cPdL1Wl6mbHAWjHnatUUhlDUCVUsmVTibuqTseTjQxQ.jpg?auto=webp&s=53fa9f7fd7c5b2ad148b1d0137720030f5a2c8bf' },
     { id: 40, name: 'Lily',         group: 'NMIXX',       videoId: 'HMIUqdzm0bs?si=GXJ55DuQRMVyvgcv', isPremium: false, image: 'https://preview.redd.it/230520-nmixx-instagram-update-lily-v0-fy1fccexmw0b1.jpg?width=640&crop=smart&auto=webp&s=86e4ba4ea288e64a286fb8d6176e5652be57e02f' },
     { id: 41, name: 'Rei',         group: 'IVE',       videoId: 'RgVu5AehEx4?si=TR_DqPhiVnzzxKHl', isPremium: false, image: 'https://pbs.twimg.com/media/GPjoMxoXcAAs_KT.jpg' },
+    { id: 42, name: 'Sunghoon',   group: 'ENHYPEN',   videoId: 'oI7DfIUQYhI?si=uz5L21F_Uey6gW_e', isPremium: false, image: 'https://dk2dv4ezy246u.cloudfront.net/widgets/sSMXxHfbVfq_large.jpg' },
     
   ];
 
-  const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA', 'ITZY', 'TWICE', 'SHINEE', 'G-IDLE', 'NMIXX'];
+  const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'ENHYPEN', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA', 'ITZY', 'TWICE', 'SHINEE', 'G-IDLE', 'NMIXX'];
 
   const showToast = (message, emoji, subtext) => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
