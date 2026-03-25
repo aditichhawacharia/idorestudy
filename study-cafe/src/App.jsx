@@ -976,6 +976,8 @@ const StudyCafe = () => {
     { id: 7, name: 'Aespa Piano Mix',             icon: '🌙', videoId: '8TF58QbQTFY?si=6nzyxV_e7jzz9cKL' },
     { id: 8, name: 'Red Velvet Lofi Mix',         icon: '🍒', videoId: 'Z6qTC5PY-u4?si=9JxJxBKmZXXG7rgV' },
     { id: 9, name: 'XLOV Instrumentals',         icon: '🖤', videoId: 'C8_e_gER1f0?si=sPKx-LIji_JJF62v' },
+    { id: 10, name: 'ILLIT Instrumentals',         icon: '⭐', videoId: 'BTlZZu-SoAI?si=Q_uQHu9vW3KCJeD6' },
+
   ];
 
   const [selectedMusic, setSelectedMusic] = useState(musicOptions[0]);
@@ -1000,13 +1002,14 @@ const StudyCafe = () => {
     { id: 31, name: 'Lee Know',      group: 'Stray Kids',  videoId: '9CKliRdrawg?si=9G33xVOldR2a3nIa', isPremium: false, image: 'https://www.kpoppinkstore.com/cdn/shop/files/ALEEKNOW_620x.webp?v=1739838906' },
     { id: 32, name: 'Yunah',        group: 'ILLIT',       videoId: 'Kz5ie0SAPJM?si=VfoZlZkZ1t2Blwoc', isPremium: false, image: 'https://www.billboard.com/wp-content/uploads/2024/06/ILLIT-Rookie-Spotlight-YUNAH-billboard-1240.jpg?w=800' },
     { id: 33, name: 'Wonhee',        group: 'ILLIT',       videoId: 'gY5nbjT8ZYU?si=jWYNzxoQb0eYuhmb', isPremium: false, image: 'https://yt3.googleusercontent.com/XKcAXSDCdTjZbK1L-kXT0v61K-tw6xwzPn9aMmPUdbmMW8mMygmkJswoXdlMJU7DNm_oifQ8mw=s900-c-k-c0x00ffffff-no-rj' },
-    { id: 34, name: 'Chuu',         group: 'LOONA',       videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc', isPremium: false, image: 'https://i.pinimg.com/236x/61/ca/c0/61cac0fbfccbc41b5137cb87bb03fd00.jpg' },
-    { id: 35, name: 'Yuna',         group: 'ITZY',       videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_', isPremium: false, image: 'https://pbs.twimg.com/media/E6OrSSsWYAE-Naw.jpg' },
-    { id: 36, name: 'Key',         group: 'SHINEE',       videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP', isPremium: false, image: 'https://nolae.eu/cdn/shop/articles/key-shinee-profil-731664.jpg?v=1723729868&width=1200' },
-    { id: 37, name: 'Dahyun',         group: 'TWICE',       videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4', isPremium: false, image: 'https://i.pinimg.com/736x/44/1f/22/441f225db0f809e10a0b9abfda93cca5.jpg' },
-    { id: 38, name: 'Yuqi',         group: 'G-IDLE',       videoId: 'gKIGXBkW56Y?si=vP0xmCSwLFDJD9Fq', isPremium: false, image: 'https://external-preview.redd.it/231016-official-update-yuqi-on-star-of-star-girls-v0-cPdL1Wl6mbHAWjHnatUUhlDUCVUsmVTibuqTseTjQxQ.jpg?auto=webp&s=53fa9f7fd7c5b2ad148b1d0137720030f5a2c8bf' },
-    { id: 39, name: 'Lily',         group: 'NMIXX',       videoId: 'HMIUqdzm0bs?si=GXJ55DuQRMVyvgcv', isPremium: false, image: 'https://preview.redd.it/230520-nmixx-instagram-update-lily-v0-fy1fccexmw0b1.jpg?width=640&crop=smart&auto=webp&s=86e4ba4ea288e64a286fb8d6176e5652be57e02f' },
-    { id: 40, name: 'Rei',         group: 'IVE',       videoId: 'RgVu5AehEx4?si=TR_DqPhiVnzzxKHl', isPremium: false, image: 'https://pbs.twimg.com/media/GPjoMxoXcAAs_KT.jpg' },
+    { id: 34, name: 'Moka',        group: 'ILLIT',       videoId: 'fwMMBtUucng?si=kLOwcp6PNzugbUhe', isPremium: false, image: 'https://preview.redd.it/are-there-any-updates-on-moka-v0-tpht1eanzowf1.jpeg?auto=webp&s=e9cb1613078635750d1b66c83370ef38a0adadfc' },
+    { id: 35, name: 'Chuu',         group: 'LOONA',       videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc', isPremium: false, image: 'https://i.pinimg.com/236x/61/ca/c0/61cac0fbfccbc41b5137cb87bb03fd00.jpg' },
+    { id: 36, name: 'Yuna',         group: 'ITZY',       videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_', isPremium: false, image: 'https://pbs.twimg.com/media/E6OrSSsWYAE-Naw.jpg' },
+    { id: 37, name: 'Key',         group: 'SHINEE',       videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP', isPremium: false, image: 'https://nolae.eu/cdn/shop/articles/key-shinee-profil-731664.jpg?v=1723729868&width=1200' },
+    { id: 38, name: 'Dahyun',         group: 'TWICE',       videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4', isPremium: false, image: 'https://i.pinimg.com/736x/44/1f/22/441f225db0f809e10a0b9abfda93cca5.jpg' },
+    { id: 39, name: 'Yuqi',         group: 'G-IDLE',       videoId: 'gKIGXBkW56Y?si=vP0xmCSwLFDJD9Fq', isPremium: false, image: 'https://external-preview.redd.it/231016-official-update-yuqi-on-star-of-star-girls-v0-cPdL1Wl6mbHAWjHnatUUhlDUCVUsmVTibuqTseTjQxQ.jpg?auto=webp&s=53fa9f7fd7c5b2ad148b1d0137720030f5a2c8bf' },
+    { id: 40, name: 'Lily',         group: 'NMIXX',       videoId: 'HMIUqdzm0bs?si=GXJ55DuQRMVyvgcv', isPremium: false, image: 'https://preview.redd.it/230520-nmixx-instagram-update-lily-v0-fy1fccexmw0b1.jpg?width=640&crop=smart&auto=webp&s=86e4ba4ea288e64a286fb8d6176e5652be57e02f' },
+    { id: 41, name: 'Rei',         group: 'IVE',       videoId: 'RgVu5AehEx4?si=TR_DqPhiVnzzxKHl', isPremium: false, image: 'https://pbs.twimg.com/media/GPjoMxoXcAAs_KT.jpg' },
     
   ];
 
