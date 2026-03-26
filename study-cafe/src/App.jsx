@@ -683,6 +683,8 @@ const StudyCafe = () => {
     { id: 40, name: 'Lily', group: 'NMIXX', videoId: 'HMIUqdzm0bs?si=GXJ55DuQRMVyvgcv', image: 'https://preview.redd.it/230520-nmixx-instagram-update-lily-v0-fy1fccexmw0b1.jpg?width=640&crop=smart&auto=webp&s=86e4ba4ea288e64a286fb8d6176e5652be57e02f' },
     { id: 41, name: 'Rei', group: 'IVE', videoId: 'RgVu5AehEx4?si=TR_DqPhiVnzzxKHl', image: 'https://pbs.twimg.com/media/GPjoMxoXcAAs_KT.jpg' },
     { id: 42, name: 'Sunghoon', group: 'ENHYPEN', videoId: 'oI7DfIUQYhI?si=uz5L21F_Uey6gW_e', image: 'https://dk2dv4ezy246u.cloudfront.net/widgets/sSMXxHfbVfq_large.jpg' },
+    { id: 43, name: 'Heesung', group: 'ENHYPEN', videoId: 'sOPAM4bojbY?si=b1iUOCKquS6APC-F', image: 'https://cdn.shopify.com/s/files/1/0469/3927/5428/files/Screenshot_2024-07-03_at_10.47.49.png?v=1719996494' },
+
   ];
 
   const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'ENHYPEN', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA', 'ITZY', 'TWICE', 'SHINEE', 'G-IDLE', 'NMIXX'];
