@@ -48,7 +48,7 @@ const Ul = ({ items }) => (
 );
 
 export default function PrivacyPolicy() {
-  const lastUpdated = 'June 2025';
+  const lastUpdated = 'July 13, 2026';
 
   return (
     <>

@@ -7,6 +7,9 @@ import About from './About';
 import Contact from './Contact';
 import PrivacyPolicy from './PrivacyPolicy';
 import Terms from './Terms';
+import Resources from './Resources';
+import CookieConsent from './CookieConsent';
+import NotFound from './NotFound';
 
 const fontStyle = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
@@ -571,6 +574,7 @@ function Footer() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
           {[
+            { label: 'Resources', href: '/resources' },
             { label: 'About', href: '/about' },
             { label: 'Contact', href: '/contact' },
             { label: 'Privacy', href: '/privacy' },
@@ -1165,12 +1169,15 @@ export default function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<StudyCafe />} />
+            <Route path="/resources" element={<Resources />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
+      <CookieConsent />
       </BrowserRouter>
     </>
   );
