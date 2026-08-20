@@ -1,0 +1,12 @@
+{
+  "name": "IdoréStudy",
+  "short_name": "IdoréStudy",
+  "description": "A free focus planner, practical study library, and optional K-pop-inspired study room.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffafc",
+  "theme_color": "#d9437f",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
