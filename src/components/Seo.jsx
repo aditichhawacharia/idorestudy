@@ -1,8 +1,5 @@
 import { useEffect } from 'react';
-
-const SITE_NAME = 'IdoréStudy';
-const SITE_URL = 'https://idorestudy.com';
-const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
+import { DEFAULT_SOCIAL_IMAGE, SITE_NAME, SITE_URL } from '../config/site.js';
 
 function setMeta(selector, attributes) {
   let element = document.head.querySelector(selector);
@@ -32,7 +29,7 @@ export default function Seo({
   description,
   path = '/',
   type = 'website',
-  image = DEFAULT_IMAGE,
+  image = DEFAULT_SOCIAL_IMAGE,
   noIndex = false,
   structuredData,
   publishedTime,
@@ -63,13 +60,13 @@ export default function Seo({
     setMeta('meta[property="og:image"]', { property: 'og:image', content: image });
     setMeta('meta[property="og:image:width"]', { property: 'og:image:width', content: '1200' });
     setMeta('meta[property="og:image:height"]', { property: 'og:image:height', content: '630' });
-    setMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${SITE_NAME} study planner and focus room` });
+    setMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${SITE_NAME} K-pop study room and study-guide library` });
 
     setMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
     setMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: fullTitle });
     setMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
     setMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: image });
-    setMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: `${SITE_NAME} study planner and focus room` });
+    setMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: `${SITE_NAME} K-pop study room and study-guide library` });
 
     if (author) setMeta('meta[name="author"]', { name: 'author', content: author });
     else removeMeta('meta[name="author"]');
@@ -79,8 +76,7 @@ export default function Seo({
     else removeMeta('meta[property="article:modified_time"]');
 
     const scriptId = 'route-structured-data';
-    const oldScript = document.getElementById(scriptId);
-    if (oldScript) oldScript.remove();
+    document.getElementById(scriptId)?.remove();
     if (structuredData) {
       const script = document.createElement('script');
       script.id = scriptId;
@@ -89,10 +85,7 @@ export default function Seo({
       document.head.appendChild(script);
     }
 
-    return () => {
-      const routeScript = document.getElementById(scriptId);
-      if (routeScript) routeScript.remove();
-    };
+    return () => document.getElementById(scriptId)?.remove();
   }, [title, description, path, type, image, noIndex, structuredData, publishedTime, modifiedTime, author]);
 
   return null;

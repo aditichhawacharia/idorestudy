@@ -1,4 +1,6 @@
-export const guides = [
+import { additionalGuides } from './additionalGuides.js';
+
+const coreGuides = [
   {
     slug: 'pomodoro-study-session',
     title: 'How to Build a Pomodoro Session That Actually Matches Your Work',
@@ -589,6 +591,8 @@ export const guides = [
     ],
   },
 ];
+
+export const guides = [...coreGuides, ...additionalGuides];
 
 export function getGuide(slug) {
   return guides.find((guide) => guide.slug === slug);

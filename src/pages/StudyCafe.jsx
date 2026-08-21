@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Coffee, Music, Volume2, VolumeX, Settings, Star, Users, ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Heart, Sparkles, Clock, ChevronUp, ChevronDown, Minimize2, Maximize2, CheckSquare, Square, Plus, Trash2, X, ArrowLeft, ExternalLink } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import Seo from '../components/Seo.jsx';
+import BuddyArtwork from '../components/BuddyArtwork.jsx';
+import { buddyGroups, getBuddyById, studyBuddies } from '../data/studyBuddies.js';
+import { musicOptions } from '../data/musicOptions.js';
 
 
 const fontStyle = `
@@ -597,53 +601,6 @@ function TikTokIcon({ size = 20, color = 'currentColor' }) {
 }
 
 
-const GROUP_PALETTES = {
-  BLACKPINK: ['#f7a7c5', '#50233c'],
-  BTS: ['#a78bfa', '#4c1d95'],
-  IVE: ['#fb7185', '#7e22ce'],
-  ENHYPEN: ['#64748b', '#312e81'],
-  'LE SSERAFIM': ['#fda4af', '#7f1d1d'],
-  aespa: ['#818cf8', '#581c87'],
-  NewJeans: ['#67e8f9', '#1d4ed8'],
-  'Stray Kids': ['#fb7185', '#111827'],
-  ILLIT: ['#f9a8d4', '#7c3aed'],
-  'Red Velvet': ['#fb7185', '#166534'],
-  LOONA: ['#c4b5fd', '#3730a3'],
-  ITZY: ['#f472b6', '#7c2d12'],
-  TWICE: ['#fdba74', '#be185d'],
-  SHINEE: ['#5eead4', '#155e75'],
-  'G-IDLE': ['#c084fc', '#4c1d95'],
-  NMIXX: ['#38bdf8', '#be123c'],
-};
-
-function BuddyPortrait({ buddy, compact = false }) {
-  const palette = GROUP_PALETTES[buddy.group] || ['#f9a8d4', '#6d28d9'];
-  const cleanName = buddy.name.replace(/\([^)]*\)/g, '').trim();
-  const initials = cleanName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
-  const size = compact ? 64 : '100%';
-  return (
-    <div
-      role="img"
-      aria-label={`${buddy.name} from ${buddy.group}`}
-      style={{
-        width: size,
-        height: compact ? 64 : 224,
-        flexShrink: 0,
-        position: 'relative',
-        overflow: 'hidden',
-        display: 'grid',
-        placeItems: 'center',
-        borderRadius: compact ? 12 : 0,
-        background: `radial-gradient(circle at 28% 18%, rgba(255,255,255,.48), transparent 24%), linear-gradient(145deg, ${palette[0]}, ${palette[1]})`,
-      }}
-    >
-      <span aria-hidden="true" style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: compact ? 25 : 64, fontWeight: 900, color: 'white', textShadow: '0 4px 20px rgba(0,0,0,.25)' }}>{initials}</span>
-      {!compact && <span aria-hidden="true" style={{ position: 'absolute', bottom: 15, left: 18, color: 'rgba(255,255,255,.92)', fontSize: 12, fontWeight: 900, letterSpacing: '.12em', textTransform: 'uppercase' }}>{buddy.group}</span>}
-      <span aria-hidden="true" style={{ position: 'absolute', top: compact ? 6 : 16, right: compact ? 7 : 18, fontSize: compact ? 13 : 22 }}>✦</span>
-    </div>
-  );
-}
-
 // ── Footer component ──────────────────────────────────────────────────────────
 function Footer() {
   return (
@@ -702,7 +659,9 @@ function Footer() {
 
 // ── Main StudyCafe component (the actual study app, no routing) ───────────────
 const StudyCafe = () => {
-  const [selectedBuddy, setSelectedBuddy] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const buddyParam = searchParams.get('buddy');
+  const [selectedBuddy, setSelectedBuddy] = useState(() => getBuddyById(buddyParam));
   const [timerSettings, setTimerSettings] = useState(loadTimerSettings);
   const [showTimerSettings, setShowTimerSettings] = useState(false);
   const [timerMinutes, setTimerMinutes] = useState(timerSettings.studyMinutes);
@@ -748,57 +707,27 @@ const StudyCafe = () => {
     { id: 7, name: 'Matcha', emoji: '🍵' }, { id: 8, name: 'Cookie', emoji: '🍪' },
   ];
 
-  const musicOptions = [
-    { id: 0, name: 'No music', icon: '🔇', videoId: '' },
-    { id: 1, name: 'Blackpink Lo-fi Mix', icon: '🖤', videoId: 'PjsDDmv25C4?si=v3idYagDZngy3Sb8' },
-    { id: 2, name: 'Le Sserafim Rainy Piano Mix', icon: '🌸', videoId: 'I3yNehe_Zwg?si=bSovd5fGI0BDxaCS' },
-    { id: 3, name: 'Stray Kids Rainy Lofi', icon: '🌧️', videoId: 'zqdE_gIoykg?si=P1lMBcUpPErB4RW7' },
-    { id: 4, name: 'Jennie SOLO Orchestral', icon: '🎻', videoId: 'GWR6yukGEI4?si=E0RBzLSXC05Q7n0V' },
-    { id: 5, name: 'BTS Rainy Day Piano Mix', icon: '💜', videoId: 'RdLjg7ZGxuE?si=vjNxrl1k4DQ7ziV6' },
-    { id: 6, name: 'IVE Rainy Day Piano Mix', icon: '🌹', videoId: 'LiT2sIN-Pg8?si=Vl8C_GOyept1A8ms' },
-    { id: 7, name: 'Aespa Piano Mix', icon: '🌙', videoId: '8TF58QbQTFY?si=6nzyxV_e7jzz9cKL' },
-    { id: 8, name: 'Red Velvet Lofi Mix', icon: '🍒', videoId: 'Z6qTC5PY-u4?si=9JxJxBKmZXXG7rgV' },
-    { id: 9, name: 'XLOV Instrumentals', icon: '🖤', videoId: 'C8_e_gER1f0?si=sPKx-LIji_JJF62v' },
-    { id: 10, name: 'ILLIT Instrumentals', icon: '⭐', videoId: 'BTlZZu-SoAI?si=Q_uQHu9vW3KCJeD6' },
-    { id: 11, name: 'Enhypen Moonstruck Orchestral', icon: '🌙', videoId: 'yCq9AHVFNKA?si=lqpt13-Fg-NU9KND' },
-  ];
-
   const [selectedMusic, setSelectedMusic] = useState(musicOptions[0]);
 
-  const studyBuddies = [
-    { id: 1, name: 'Rosé', group: 'BLACKPINK', videoId: 'oadMhHMubQ4?si=fdyQ5nAQQgIZ2KC2' },
-    { id: 2, name: 'Jennie', group: 'BLACKPINK', videoId: 'Fe8kR3W9VGA?si=lOhkuY6w6hc7vlRl' },
-    { id: 3, name: 'Lisa', group: 'BLACKPINK', videoId: 'tX9rWUJUGbk?si=1cwwtiNJNLHZ6BkT' },
-    { id: 5, name: 'Jungkook', group: 'BTS', videoId: 'xy_mVVv4Oc0?si=XIcdkXpt9NFM70IL' },
-    { id: 6, name: 'V (Taehyung)', group: 'BTS', videoId: 'Xt2wCvkSegU?si=RQO_W8pmXh7KOzb-' },
-    { id: 7, name: 'Jimin', group: 'BTS', videoId: 'KxE4i8-nYEs?si=C5vcXDoBao4Ubwmr' },
-    { id: 12, name: 'Wonyoung', group: 'IVE', videoId: 'ZZaA0c-PsXc?si=EZJuOje8auDVqNQT' },
-    { id: 15, name: 'Chaewon', group: 'LE SSERAFIM', videoId: '3one8kjAAQI?si=Lx74Rk6W62Mk1YWv' },
-    { id: 17, name: 'Kazuha', group: 'LE SSERAFIM', videoId: 'KznmfOQrK_E?si=I-mvB2p7JTPKhA8m' },
-    { id: 18, name: 'Karina', group: 'aespa', videoId: 'r6OQFloCDZw?si=ajwYkdn7wDS7p1nR' },
-    { id: 22, name: 'Minji', group: 'NewJeans', videoId: 'LhIivrX4gKk?si=VX33cAITX0kpqKE_' },
-    { id: 24, name: 'Seulgi', group: 'Red Velvet', videoId: 'UZOnLTTiZKY?si=yeswGn2PlAAqNpgf' },
-    { id: 27, name: 'Bang Chan', group: 'Stray Kids', videoId: 'ANuQjiEMMcU?si=85lRUokCKtNzHBJm' },
-    { id: 28, name: 'Felix', group: 'Stray Kids', videoId: 'EYpwvrJlV-s?si=3BQrSp7AtwvOucAI' },
-    { id: 29, name: 'Han', group: 'Stray Kids', videoId: 'TMjrez7sv5o?si=z553RJcHnTC7JXpf' },
-    { id: 30, name: 'Hyunjin', group: 'Stray Kids', videoId: 'QFfZlBdAhgs?si=dYxdJAq3oc4V6R4J' },
-    { id: 31, name: 'Lee Know', group: 'Stray Kids', videoId: '9CKliRdrawg?si=9G33xVOldR2a3nIa' },
-    { id: 32, name: 'Yunah', group: 'ILLIT', videoId: 'Kz5ie0SAPJM?si=VfoZlZkZ1t2Blwoc' },
-    { id: 33, name: 'Wonhee', group: 'ILLIT', videoId: 'gY5nbjT8ZYU?si=jWYNzxoQb0eYuhmb' },
-    { id: 34, name: 'Moka', group: 'ILLIT', videoId: 'fwMMBtUucng?si=kLOwcp6PNzugbUhe' },
-    { id: 35, name: 'Chuu', group: 'LOONA', videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc' },
-    { id: 36, name: 'Yuna', group: 'ITZY', videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_' },
-    { id: 37, name: 'Key', group: 'SHINEE', videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP' },
-    { id: 38, name: 'Dahyun', group: 'TWICE', videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4' },
-    { id: 39, name: 'Yuqi', group: 'G-IDLE', videoId: 'gKIGXBkW56Y?si=vP0xmCSwLFDJD9Fq' },
-    { id: 40, name: 'Lily', group: 'NMIXX', videoId: 'HMIUqdzm0bs?si=GXJ55DuQRMVyvgcv' },
-    { id: 41, name: 'Rei', group: 'IVE', videoId: 'RgVu5AehEx4?si=TR_DqPhiVnzzxKHl' },
-    { id: 42, name: 'Sunghoon', group: 'ENHYPEN', videoId: 'oI7DfIUQYhI?si=uz5L21F_Uey6gW_e' },
-    { id: 43, name: 'Heesung', group: 'ENHYPEN', videoId: 'sOPAM4bojbY?si=b1iUOCKquS6APC-F' },
+  useEffect(() => {
+    const routeBuddy = getBuddyById(buddyParam);
+    setSelectedBuddy((current) => {
+      if (current?.id === routeBuddy?.id) return current;
+      return routeBuddy;
+    });
+  }, [buddyParam]);
 
-  ];
+  const chooseBuddy = (buddy) => {
+    setSelectedBuddy(buddy);
+    setSearchParams({ buddy: String(buddy.id) });
+  };
 
-  const groups = ['All', 'BLACKPINK', 'BTS', 'IVE', 'ENHYPEN', 'LE SSERAFIM', 'aespa', 'NewJeans', 'Stray Kids', 'ILLIT', 'Red Velvet', 'LOONA', 'ITZY', 'TWICE', 'SHINEE', 'G-IDLE', 'NMIXX'];
+  const clearBuddy = () => {
+    setSelectedBuddy(null);
+    setSearchParams({});
+  };
+
+  const groups = buddyGroups;
 
   const showToast = (message, emoji, subtext) => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
@@ -945,12 +874,12 @@ const StudyCafe = () => {
                 <button
                   type="button"
                   key={buddy.id}
-                  onClick={() => setSelectedBuddy(buddy)}
+                  onClick={() => chooseBuddy(buddy)}
                   className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all cursor-pointer transform hover:scale-105 hover:-translate-y-2 group relative border-2 border-pink-100 hover:border-pink-300 text-left"
                   aria-label={`Study with ${buddy.name} from ${buddy.group}`}
                 >
                   <div className="relative">
-                    <BuddyPortrait buddy={buddy} />
+                    <BuddyArtwork buddy={buddy} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform">
                       <div className="flex items-center gap-2"><Heart className="w-4 h-4 text-pink-300" /><span className="text-white text-xs font-bold">Open this focus room</span></div>
@@ -1024,12 +953,12 @@ const StudyCafe = () => {
           </div>
           <div className="space-y-3 pb-24">
             {studyBuddies.map(buddy => (
-              <button type="button" aria-label={`Switch study room to ${buddy.name} from ${buddy.group}`} key={buddy.id} onClick={() => setSelectedBuddy(buddy)}
+              <button type="button" aria-label={`Switch study room to ${buddy.name} from ${buddy.group}`} key={buddy.id} onClick={() => chooseBuddy(buddy)}
                 className={`w-full rounded-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden ${selectedBuddy.id === buddy.id ? 'shadow-2xl scale-105' : 'shadow-lg'}`}
                 style={{ background: 'white', border: selectedBuddy.id === buddy.id ? '3px solid #FF6B9D' : '2px solid #FFD7E5' }}>
                 <div className="flex items-center gap-3 p-2.5">
                   <div className="relative">
-                    <BuddyPortrait buddy={buddy} compact />
+                    <BuddyArtwork buddy={buddy} compact />
                     {selectedBuddy.id === buddy.id && (
                       <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full p-1">
                         <Heart className="w-3 h-3 text-white fill-white" />
@@ -1046,7 +975,7 @@ const StudyCafe = () => {
             ))}
           </div>
           <div className="sticky bottom-0 bg-gradient-to-t from-pink-50 to-transparent pt-4">
-            <button type="button" onClick={() => setSelectedBuddy(null)}
+            <button type="button" onClick={clearBuddy}
               className="w-full py-4 rounded-2xl font-black text-white shadow-2xl transition transform hover:scale-105"
               style={{ background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' }}>
               <div className="flex items-center justify-center gap-2"><Coffee className="w-5 h-5" />Back to Café<Heart className="w-4 h-4" /></div>

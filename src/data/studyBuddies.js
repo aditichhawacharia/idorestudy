@@ -1,0 +1,76 @@
+export const studyBuddies = [
+  { id: 1, name: 'Rosé', group: 'BLACKPINK', videoId: 'oadMhHMubQ4?si=fdyQ5nAQQgIZ2KC2' },
+  { id: 2, name: 'Jennie', group: 'BLACKPINK', videoId: 'Fe8kR3W9VGA?si=lOhkuY6w6hc7vlRl' },
+  { id: 3, name: 'Lisa', group: 'BLACKPINK', videoId: 'tX9rWUJUGbk?si=1cwwtiNJNLHZ6BkT' },
+  { id: 5, name: 'Jungkook', group: 'BTS', videoId: 'xy_mVVv4Oc0?si=XIcdkXpt9NFM70IL' },
+  { id: 6, name: 'V (Taehyung)', group: 'BTS', videoId: 'Xt2wCvkSegU?si=RQO_W8pmXh7KOzb-' },
+  { id: 7, name: 'Jimin', group: 'BTS', videoId: 'KxE4i8-nYEs?si=C5vcXDoBao4Ubwmr' },
+  { id: 12, name: 'Wonyoung', group: 'IVE', videoId: 'ZZaA0c-PsXc?si=EZJuOje8auDVqNQT' },
+  { id: 15, name: 'Chaewon', group: 'LE SSERAFIM', videoId: '3one8kjAAQI?si=Lx74Rk6W62Mk1YWv' },
+  { id: 17, name: 'Kazuha', group: 'LE SSERAFIM', videoId: 'KznmfOQrK_E?si=I-mvB2p7JTPKhA8m' },
+  { id: 18, name: 'Karina', group: 'aespa', videoId: 'r6OQFloCDZw?si=ajwYkdn7wDS7p1nR' },
+  { id: 22, name: 'Minji', group: 'NewJeans', videoId: 'LhIivrX4gKk?si=VX33cAITX0kpqKE_' },
+  { id: 24, name: 'Seulgi', group: 'Red Velvet', videoId: 'UZOnLTTiZKY?si=yeswGn2PlAAqNpgf' },
+  { id: 27, name: 'Bang Chan', group: 'Stray Kids', videoId: 'ANuQjiEMMcU?si=85lRUokCKtNzHBJm' },
+  { id: 28, name: 'Felix', group: 'Stray Kids', videoId: 'EYpwvrJlV-s?si=3BQrSp7AtwvOucAI' },
+  { id: 29, name: 'Han', group: 'Stray Kids', videoId: 'TMjrez7sv5o?si=z553RJcHnTC7JXpf' },
+  { id: 30, name: 'Hyunjin', group: 'Stray Kids', videoId: 'QFfZlBdAhgs?si=dYxdJAq3oc4V6R4J' },
+  { id: 31, name: 'Lee Know', group: 'Stray Kids', videoId: '9CKliRdrawg?si=9G33xVOldR2a3nIa' },
+  { id: 32, name: 'Yunah', group: 'ILLIT', videoId: 'Kz5ie0SAPJM?si=VfoZlZkZ1t2Blwoc' },
+  { id: 33, name: 'Wonhee', group: 'ILLIT', videoId: 'gY5nbjT8ZYU?si=jWYNzxoQb0eYuhmb' },
+  { id: 34, name: 'Moka', group: 'ILLIT', videoId: 'fwMMBtUucng?si=kLOwcp6PNzugbUhe' },
+  { id: 35, name: 'Chuu', group: 'LOONA', videoId: 'bDQRKF4jTuQ?si=YZe4cd0s_7EZShDc' },
+  { id: 36, name: 'Yuna', group: 'ITZY', videoId: 'iLzKAgu_5g4?si=9mjs1w33ymMcjfS_' },
+  { id: 37, name: 'Key', group: 'SHINee', videoId: 'lMqr_YXI9IM?si=jH8UmTxaTCakVUiP' },
+  { id: 38, name: 'Dahyun', group: 'TWICE', videoId: '47ocn-7vw-E?si=Xkf8ccNzCBwcJ1p4' },
+  { id: 39, name: 'Yuqi', group: '(G)I-DLE', videoId: 'gKIGXBkW56Y?si=vP0xmCSwLFDJD9Fq' },
+  { id: 40, name: 'Lily', group: 'NMIXX', videoId: 'HMIUqdzm0bs?si=GXJ55DuQRMVyvgcv' },
+  { id: 41, name: 'Rei', group: 'IVE', videoId: 'RgVu5AehEx4?si=TR_DqPhiVnzzxKHl' },
+  { id: 42, name: 'Sunghoon', group: 'ENHYPEN', videoId: 'oI7DfIUQYhI?si=uz5L21F_Uey6gW_e' },
+  { id: 43, name: 'Heeseung', group: 'ENHYPEN', videoId: 'sOPAM4bojbY?si=b1iUOCKquS6APC-F' },
+];
+
+export const buddyGroups = [
+  'All',
+  'BLACKPINK',
+  'BTS',
+  'IVE',
+  'ENHYPEN',
+  'LE SSERAFIM',
+  'aespa',
+  'NewJeans',
+  'Stray Kids',
+  'ILLIT',
+  'Red Velvet',
+  'LOONA',
+  'ITZY',
+  'TWICE',
+  'SHINee',
+  '(G)I-DLE',
+  'NMIXX',
+];
+
+export const groupPalettes = {
+  BLACKPINK: ['#E773A5', '#402235'],
+  BTS: ['#8B76C8', '#34245F'],
+  IVE: ['#CB6C8C', '#5D326D'],
+  ENHYPEN: ['#68758B', '#29304A'],
+  'LE SSERAFIM': ['#D8808E', '#5D2E36'],
+  aespa: ['#707BC4', '#3C2D67'],
+  NewJeans: ['#4D9CAF', '#244E78'],
+  'Stray Kids': ['#B65A68', '#282A35'],
+  ILLIT: ['#C67FA7', '#57417C'],
+  'Red Velvet': ['#B96073', '#365C47'],
+  LOONA: ['#9587C6', '#3D3769'],
+  ITZY: ['#C36693', '#6A4134'],
+  TWICE: ['#CB896C', '#8B3E66'],
+  SHINee: ['#4E9C95', '#2E5A67'],
+  '(G)I-DLE': ['#9A68B8', '#43285D'],
+  NMIXX: ['#4D8EBA', '#833C53'],
+};
+
+export function getBuddyById(value) {
+  const id = Number.parseInt(String(value), 10);
+  if (!Number.isFinite(id)) return null;
+  return studyBuddies.find((buddy) => buddy.id === id) || null;
+}

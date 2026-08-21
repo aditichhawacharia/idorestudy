@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
         <div className="narrow-wrap">
           <p className="eyebrow"><ShieldCheck size={16} aria-hidden="true" /> Privacy policy</p>
           <h1 className="content-title">What is stored, what may be shared, and what you can control.</h1>
-          <p className="content-lead">Last updated {updated}. This policy applies to idorestudy.com and its study room.</p>
+          <p className="content-lead">Last updated {updated}. This policy applies to idorestudy.app and its study room.</p>
         </div>
       </header>
 

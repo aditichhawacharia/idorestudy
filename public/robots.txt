@@ -4,7 +4,4 @@ Allow: /
 User-agent: Mediapartners-Google
 Allow: /
 
-User-agent: Googlebot
-Allow: /
-
-Sitemap: https://idorestudy.com/sitemap.xml
+Sitemap: https://idorestudy.app/sitemap.xml

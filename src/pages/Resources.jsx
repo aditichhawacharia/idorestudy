@@ -1,57 +1,146 @@
-import { ArrowRight, BookOpen, CheckCircle2, Clock3, Compass, RotateCcw } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import {
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  Clock3,
+  Compass,
+  FileCheck2,
+  RotateCcw,
+  Search,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdSlot from '../components/AdSlot.jsx';
 import Seo from '../components/Seo.jsx';
-import { guides } from '../data/guides.js';
+import { EDITORIAL_NAME, SITE_URL } from '../config/site.js';
+import { guideIndex } from '../data/guideIndex.js';
 
 const resourcesAdSlot = import.meta.env.VITE_ADSENSE_RESOURCES_SLOT;
+const categories = ['All', ...new Set(guideIndex.map((guide) => guide.category))];
 
 export default function Resources() {
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('All');
+
+  const filteredGuides = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return guideIndex.filter((guide) => {
+      const categoryMatch = category === 'All' || guide.category === category;
+      const queryMatch = !normalized || [guide.title, guide.description, guide.category, ...guide.keywords]
+        .join(' ')
+        .toLowerCase()
+        .includes(normalized);
+      return categoryMatch && queryMatch;
+    });
+  }, [category, query]);
+
   return (
     <>
       <Seo
         title="Practical Study Guides"
-        description="Original, practical guides to Pomodoro sessions, active recall, spaced practice, exam planning, study music, breaks, and distraction-light study spaces."
+        description={`${guideIndex.length} original, practical guides for focus planning, active recall, spaced review, exam preparation, reading, problem solving, and study routines.`}
         path="/resources"
+        author={EDITORIAL_NAME}
         structuredData={{
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
           name: 'IdoréStudy practical study guides',
-          description: 'Original study guides for planning, retrieval practice, exam preparation, and focus environments.',
-          url: 'https://idorestudy.com/resources',
-          hasPart: guides.map((guide) => ({
+          description: 'Original, source-supported study guides with concrete routines, examples, and review prompts.',
+          url: `${SITE_URL}/resources`,
+          author: { '@type': 'Organization', name: EDITORIAL_NAME, url: `${SITE_URL}/about` },
+          hasPart: guideIndex.map((guide) => ({
             '@type': 'Article',
             headline: guide.title,
-            url: `https://idorestudy.com/resources/${guide.slug}`,
+            url: `${SITE_URL}/resources/${guide.slug}`,
+            datePublished: guide.datePublished,
+            dateModified: guide.dateModified,
           })),
         }}
       />
 
-      <header className="resource-hero">
-        <div className="narrow-wrap">
-          <p className="eyebrow"><BookOpen size={16} aria-hidden="true" /> Original study resources</p>
-          <h1 className="content-title">Practical methods for the part after you press “start.”</h1>
-          <p className="content-lead">
-            These guides focus on decisions you can observe: what to finish, how to retrieve information,
-            when to schedule another attempt, and how to tell whether your environment is helping.
-          </p>
+      <header className="resource-hero professional-hero">
+        <div className="page-wrap resource-hero-layout">
+          <div>
+            <p className="eyebrow"><BookOpen size={16} aria-hidden="true" /> Original study guidance</p>
+            <h1 className="content-title">Study methods explained as actions you can use today.</h1>
+            <p className="content-lead">
+              Browse {guideIndex.length} detailed guides on planning, retrieval practice, reading, problem solving,
+              exam preparation, study environments, and sustainable routines. Each article includes concrete
+              prompts, examples, publication details, and supporting references where relevant.
+            </p>
+            <p className="page-byline">Written and maintained by <Link to="/about#publisher">{EDITORIAL_NAME}</Link> · Updated August 20, 2026</p>
+          </div>
+          <aside className="resource-summary" aria-label="Guide library summary">
+            <strong>{guideIndex.length}</strong>
+            <span>in-depth guides</span>
+            <p>Every guide contains at least 600 words, practical examples, and a visible source section.</p>
+          </aside>
         </div>
       </header>
 
-      <section className="section" style={{ paddingTop: 28 }}>
+      <section className="section resource-library" aria-labelledby="guide-library-title">
         <div className="page-wrap">
-          <div className="card-grid">
-            {guides.map((guide) => (
-              <article className="guide-card" key={guide.slug}>
-                <div className="guide-meta"><span>{guide.category}</span><span>{guide.readTime}</span></div>
-                <h2>{guide.title}</h2>
-                <p>{guide.description}</p>
-                <Link className="guide-link" to={`/resources/${guide.slug}`}>
-                  Read the full guide <ArrowRight size={15} style={{ display: 'inline', verticalAlign: '-2px' }} />
-                </Link>
-              </article>
-            ))}
+          <div className="library-heading-row">
+            <div className="section-heading">
+              <p className="eyebrow"><SlidersHorizontal size={16} aria-hidden="true" /> Find the right guide</p>
+              <h2 id="guide-library-title">Browse the full study-guide library</h2>
+              <p>Search by topic or use a category filter. The article opens on its own indexable page.</p>
+            </div>
+            <p className="library-result-count" aria-live="polite">{filteredGuides.length} of {guideIndex.length} guides</p>
           </div>
+
+          <div className="guide-library-controls">
+            <label className="guide-search">
+              <Search size={18} aria-hidden="true" />
+              <span className="sr-only">Search study guides</span>
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search active recall, exams, notes, focus…"
+              />
+            </label>
+            <div className="guide-category-filter" aria-label="Filter study guides by category">
+              {categories.map((item) => (
+                <button
+                  type="button"
+                  key={item}
+                  className={category === item ? 'active' : ''}
+                  aria-pressed={category === item}
+                  onClick={() => setCategory(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {filteredGuides.length > 0 ? (
+            <div className="guide-library-grid">
+              {filteredGuides.map((guide) => (
+                <article className="guide-card professional-guide-card" key={guide.slug}>
+                  <div className="guide-meta"><span>{guide.category}</span><span>{guide.readTime}</span></div>
+                  <h2>{guide.title}</h2>
+                  <p>{guide.description}</p>
+                  <div className="guide-card-footer">
+                    <span>Published {new Date(`${guide.datePublished}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <Link className="guide-link" to={`/resources/${guide.slug}`}>
+                      Read guide <ArrowRight size={15} aria-hidden="true" />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <h3>No guide matches that search.</h3>
+              <p>Clear the search or choose another category to see the full library.</p>
+              <button type="button" className="secondary-button" onClick={() => { setQuery(''); setCategory('All'); }}>
+                Clear filters
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -60,44 +149,47 @@ export default function Resources() {
       <section className="section section-soft">
         <div className="page-wrap">
           <div className="section-heading">
-            <p className="eyebrow"><Compass size={16} aria-hidden="true" /> A simple way to choose</p>
-            <h2>Start with the problem you can see.</h2>
+            <p className="eyebrow"><Compass size={16} aria-hidden="true" /> Choose by the problem you can see</p>
+            <h2>Three reliable starting points</h2>
           </div>
           <div className="card-grid">
             <article className="info-card">
               <span className="icon-tile"><Clock3 size={21} aria-hidden="true" /></span>
               <h3>I cannot get started</h3>
-              <p>Use the Pomodoro guide to shrink the next action and choose an interval with low enough resistance.</p>
-              <Link className="guide-link" to="/resources/pomodoro-study-session">Open the Pomodoro guide</Link>
+              <p>Reduce the task to one visible outcome and choose a focus interval that fits today’s energy.</p>
+              <Link className="guide-link" to="/resources/start-studying-when-overwhelmed">Start when overwhelmed</Link>
             </article>
             <article className="info-card">
               <span className="icon-tile"><RotateCcw size={21} aria-hidden="true" /></span>
-              <h3>I recognize the notes but cannot answer questions</h3>
-              <p>Use active recall to turn headings into prompts, attempt answers closed-book, and revisit only the gaps.</p>
-              <Link className="guide-link" to="/resources/active-recall-guide">Open the active recall guide</Link>
+              <h3>I recognize my notes but cannot answer questions</h3>
+              <p>Turn headings into prompts, retrieve without looking, and use feedback to repair only the gaps.</p>
+              <Link className="guide-link" to="/resources/active-recall-guide">Use active recall</Link>
             </article>
             <article className="info-card">
               <span className="icon-tile"><CheckCircle2 size={21} aria-hidden="true" /></span>
-              <h3>Everything feels urgent</h3>
-              <p>Use the exam-week plan to rank topics by likely importance and current weakness before building the schedule.</p>
-              <Link className="guide-link" to="/resources/exam-week-study-plan">Open the exam-week guide</Link>
+              <h3>I am falling behind</h3>
+              <p>Protect current deadlines, identify prerequisite gaps, and build short catch-up blocks with real outputs.</p>
+              <Link className="guide-link" to="/resources/catch-up-study-plan">Build a catch-up plan</Link>
             </article>
           </div>
         </div>
       </section>
 
       <section className="section">
-        <div className="narrow-wrap">
-          <div className="content-card" style={{ padding: 'clamp(24px, 5vw, 42px)' }}>
-            <h2 style={{ marginTop: 0, fontFamily: 'Playfair Display, Georgia, serif' }}>A five-minute reset before any study session</h2>
-            <ol className="steps">
-              <li><strong>Write one output:</strong> state what will exist when the block is finished.</li>
-              <li><strong>Open the minimum:</strong> keep only the materials required for that output.</li>
-              <li><strong>Choose a timer:</strong> use a length you can sustain today, not your ideal-day maximum.</li>
-              <li><strong>Plan the break:</strong> select a stopping activity before the focus block begins.</li>
-              <li><strong>Leave a next action:</strong> make tomorrow’s starting point visible before you close.</li>
-            </ol>
-            <p className="note">The timer supplies a boundary. The output and review are what make the boundary useful.</p>
+        <div className="page-wrap editorial-trust-panel">
+          <div>
+            <p className="eyebrow"><FileCheck2 size={16} aria-hidden="true" /> Editorial standards</p>
+            <h2>How these guides are written and maintained</h2>
+            <p>
+              IdoréStudy articles are written for practical use rather than search-volume padding. Guidance is
+              organized around observable decisions and examples. Research links are included when an established
+              learning principle supports the article, and correction requests are reviewed through a published process.
+            </p>
+          </div>
+          <div className="editorial-trust-links">
+            <Link to="/about#publisher">Publisher information</Link>
+            <Link to="/editorial-policy">Editorial and corrections policy</Link>
+            <Link to="/disclaimer">Educational disclaimer</Link>
           </div>
         </div>
       </section>

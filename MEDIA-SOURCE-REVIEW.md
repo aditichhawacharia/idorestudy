@@ -32,33 +32,39 @@ For each row, replace **Pending** with **Approved** or **Removed**, add the chan
 | Moka | ILLIT | https://www.youtube.com/watch?v=fwMMBtUucng | Pending |  |  |
 | Chuu | LOONA | https://www.youtube.com/watch?v=bDQRKF4jTuQ | Pending |  |  |
 | Yuna | ITZY | https://www.youtube.com/watch?v=iLzKAgu_5g4 | Pending |  |  |
-| Key | SHINEE | https://www.youtube.com/watch?v=lMqr_YXI9IM | Pending |  |  |
+| Key | SHINee | https://www.youtube.com/watch?v=lMqr_YXI9IM | Pending |  |  |
 | Dahyun | TWICE | https://www.youtube.com/watch?v=47ocn-7vw-E | Pending |  |  |
-| Yuqi | G-IDLE | https://www.youtube.com/watch?v=gKIGXBkW56Y | Pending |  |  |
+| Yuqi | (G)I-DLE | https://www.youtube.com/watch?v=gKIGXBkW56Y | Pending |  |  |
 | Lily | NMIXX | https://www.youtube.com/watch?v=HMIUqdzm0bs | Pending |  |  |
 | Rei | IVE | https://www.youtube.com/watch?v=RgVu5AehEx4 | Pending |  |  |
 | Sunghoon | ENHYPEN | https://www.youtube.com/watch?v=oI7DfIUQYhI | Pending |  |  |
-| Heesung | ENHYPEN | https://www.youtube.com/watch?v=sOPAM4bojbY | Pending |  |  |
+| Heeseung | ENHYPEN | https://www.youtube.com/watch?v=sOPAM4bojbY | Pending |  |  |
 
 ## Background-music sources
 
 | Music option | Source | Status | Channel / basis | Reviewed |
 |---|---|---|---|---|
-| Blackpink Lo-fi Mix | https://www.youtube.com/watch?v=PjsDDmv25C4 | Pending |  |  |
-| Le Sserafim Rainy Piano Mix | https://www.youtube.com/watch?v=I3yNehe_Zwg | Pending |  |  |
+| BLACKPINK Lo-fi Mix | https://www.youtube.com/watch?v=PjsDDmv25C4 | Pending |  |  |
+| LE SSERAFIM Rainy Piano Mix | https://www.youtube.com/watch?v=I3yNehe_Zwg | Pending |  |  |
 | Stray Kids Rainy Lofi | https://www.youtube.com/watch?v=zqdE_gIoykg | Pending |  |  |
 | Jennie SOLO Orchestral | https://www.youtube.com/watch?v=GWR6yukGEI4 | Pending |  |  |
 | BTS Rainy Day Piano Mix | https://www.youtube.com/watch?v=RdLjg7ZGxuE | Pending |  |  |
 | IVE Rainy Day Piano Mix | https://www.youtube.com/watch?v=LiT2sIN-Pg8 | Pending |  |  |
-| Aespa Piano Mix | https://www.youtube.com/watch?v=8TF58QbQTFY | Pending |  |  |
+| aespa Piano Mix | https://www.youtube.com/watch?v=8TF58QbQTFY | Pending |  |  |
 | Red Velvet Lofi Mix | https://www.youtube.com/watch?v=Z6qTC5PY-u4 | Pending |  |  |
 | XLOV Instrumentals | https://www.youtube.com/watch?v=C8_e_gER1f0 | Pending |  |  |
 | ILLIT Instrumentals | https://www.youtube.com/watch?v=BTlZZu-SoAI | Pending |  |  |
-| Enhypen Moonstruck Orchestral | https://www.youtube.com/watch?v=yCq9AHVFNKA | Pending |  |  |
+| ENHYPEN Moonstruck Orchestral | https://www.youtube.com/watch?v=yCq9AHVFNKA | Pending |  |  |
 
-## Removal workflow
+## Removal or replacement workflow
 
-1. Remove or replace the entry in `src/pages/StudyCafe.jsx`.
-2. Confirm the room still loads and the source link points to the selected media.
-3. Re-run `npm run audit` and `npm run build`.
-4. Update this review log and the content policy if the media model changes.
+1. For a study-buddy source, remove or replace the entry in `src/data/studyBuddies.js`.
+2. For a music source, remove or replace the entry in `src/data/musicOptions.js`.
+3. Keep the numeric ID stable when replacing a buddy so existing direct links continue to open the intended room.
+4. Confirm the homepage card, `/study` lobby, direct `/study?buddy=<id>` route, embedded player, and visible source link still work.
+5. Update this review row to `Approved` or `Removed`, record the current channel/basis, and add the ISO review date (`YYYY-MM-DD`).
+6. Run `npm run audit`, then run the production build in a networked environment with `npm run check`.
+7. Run `npm run check:prelaunch` only after every active source has a complete review record.
+8. Update the content policy and privacy disclosures if the media model or platform changes.
+
+The prelaunch audit compares active source URLs with this table. Deleting a row without deleting the active source will not pass the gate.

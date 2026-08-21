@@ -1,8 +1,9 @@
 import { AlertCircle, Mail, MessageSquareText, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 import Seo from '../components/Seo.jsx';
+import { CONTACT_EMAIL, SITE_URL } from '../config/site.js';
 
-const address = 'idore.collections@gmail.com';
+const address = CONTACT_EMAIL;
 
 export default function Contact() {
   const [name, setName] = useState('');
@@ -32,7 +33,7 @@ export default function Contact() {
           '@context': 'https://schema.org',
           '@type': 'ContactPage',
           name: 'Contact IdoréStudy',
-          url: 'https://idorestudy.com/contact',
+          url: `${SITE_URL}/contact`,
         }}
       />
 
@@ -50,7 +51,7 @@ export default function Contact() {
       <section className="section" style={{ paddingTop: 24 }}>
         <div className="page-wrap contact-grid">
           <div className="content-card" style={{ padding: 'clamp(24px, 5vw, 42px)' }}>
-            <h2 style={{ marginTop: 0, fontFamily: 'Playfair Display, Georgia, serif' }}>Send an email</h2>
+            <h2 style={{ marginTop: 0, fontFamily: 'Georgia, serif' }}>Send an email</h2>
             <form className="form-grid" onSubmit={submit}>
               <div className="inline-fields">
                 <div className="field">

@@ -42,7 +42,7 @@ export default function SessionPlanner() {
       <div className="planner-grid">
         <div>
           <p className="eyebrow"><CalendarCheck size={16} aria-hidden="true" /> Free session planner</p>
-          <h2 id="planner-title" style={{ margin: 0, fontFamily: 'Playfair Display, Georgia, serif', fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
+          <h2 id="planner-title" style={{ margin: 0, fontFamily: 'Georgia, serif', fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
             Turn “I should study” into a specific plan.
           </h2>
           <p style={{ color: 'var(--muted)', lineHeight: 1.75 }}>

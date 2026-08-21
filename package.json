@@ -1,17 +1,19 @@
 {
-  "name": "idorestudy-adsense-ready",
+  "name": "idorestudy-professional-adsense-ready",
   "private": true,
-  "version": "2.0.0",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prerender.mjs",
+    "build": "node scripts/generate-sitemap.mjs && vite build && node scripts/prerender.mjs && node scripts/link-audit.mjs",
     "preview": "vite preview",
-    "audit": "node scripts/syntax-check.mjs && node scripts/content-audit.mjs",
+    "audit": "node scripts/syntax-check.mjs && node scripts/content-audit.mjs && npm run verify:static",
     "audit:prelaunch": "npm run audit && node scripts/prelaunch-audit.mjs",
     "check": "npm run audit && npm run build",
     "check:prelaunch": "npm run audit:prelaunch && npm run build",
-    "build:client": "vite build"
+    "build:client": "vite build",
+    "generate:sitemap": "node scripts/generate-sitemap.mjs",
+    "verify:static": "node scripts/generate-sitemap.mjs && node scripts/static-verify.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
