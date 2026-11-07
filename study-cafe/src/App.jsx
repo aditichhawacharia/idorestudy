@@ -609,6 +609,7 @@ const StudyCafe = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isMusicPaused, setIsMusicPaused] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [homeMoreOpen, setHomeMoreOpen] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [showMusicMenu, setShowMusicMenu] = useState(false);
   const [showCafeMenu, setShowCafeMenu] = useState(false);
@@ -763,89 +764,252 @@ const StudyCafe = () => {
   const filteredBuddies = selectedCategory === 'All' ? studyBuddies : studyBuddies.filter(b => b.group === selectedCategory);
   const toggleCafeItem = id => setActiveCafeItems(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
 
-  // ── LANDING PAGE ──
+  // ── LANDING PAGE ─────────────────────────────────────────────────────────────
   if (!selectedBuddy) {
-    return (
-      <div className="min-h-screen relative overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #FFF5F7 0%, #FFF9FB 25%, #F5F3FF 50%, #FFF0F5 75%, #FFF5F7 100%)' }}>
-        <div className="absolute top-20 left-12 text-4xl opacity-40 animate-bounce" style={{ animationDuration: '3s' }}>☕</div>
-        <div className="absolute top-40 right-24 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>🥐</div>
-        <Heart className="absolute top-32 right-40 w-8 h-8 text-pink-300 opacity-50 animate-pulse" style={{ animationDelay: '0.5s' }} />
-        <div className="absolute bottom-32 left-24 text-4xl opacity-40 animate-bounce" style={{ animationDelay: '2s', animationDuration: '3.5s' }}>🧋</div>
-        <div className="absolute bottom-20 right-32 text-4xl opacity-30 animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '4.5s' }}>🍰</div>
-        <Sparkles className="absolute top-1/4 right-1/4 w-8 h-8 text-purple-300 opacity-40 animate-pulse" style={{ animationDelay: '1.5s' }} />
+    const featuredRooms = [
+      { name: 'Pink Café', vibe: 'Café · Soft chatter', emoji: '☕', bg: 'linear-gradient(135deg,#ffd7e8,#f3bdd8 48%,#eadcff)' },
+      { name: 'Midnight Seoul', vibe: 'City · Lo-fi · Rain', emoji: '🌃', bg: 'linear-gradient(135deg,#6658aa,#353b67 50%,#bf659b)' },
+      { name: 'Library Night', vibe: 'Quiet · Page turning', emoji: '📚', bg: 'linear-gradient(135deg,#805c47,#b58a67 45%,#403337)' },
+      { name: 'Rainy Practice Room', vibe: 'Rain · Piano', emoji: '🌧️', bg: 'linear-gradient(135deg,#485875,#62537e 50%,#b3668c)' },
+    ];
 
-        <div className="flex-1 max-w-7xl mx-auto px-8 py-6 w-full">
-          <div className="flex items-center justify-between mb-12">
-            <div className="flex items-center gap-3">
-              <div className="relative">
+    const homeGuides = [
+      {
+        title: 'How to Use the Pomodoro Method',
+        description: 'A practical guide to using focus intervals without spending the entire session managing a timer.',
+        category: 'Focus',
+        readTime: '5 min read',
+        slug: 'pomodoro',
+        image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1000&q=85',
+      },
+      {
+        title: 'Active Recall for Exams',
+        description: 'Why remembering information without looking at your notes is more useful than reading them again.',
+        category: 'Learning',
+        readTime: '6 min read',
+        slug: 'active-recall',
+        image: 'https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=1000&q=85',
+      },
+      {
+        title: 'How Long Should a Study Session Be?',
+        description: 'Find a focus length that works for the actual task instead of forcing every subject into the same timer.',
+        category: 'Focus',
+        readTime: '4 min read',
+        slug: 'study-session-length',
+        image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1000&q=85',
+      },
+      {
+        title: 'Finals Week Study Plan',
+        description: 'A realistic way to prioritize multiple exams without pretending you have unlimited time and energy.',
+        category: 'Planning',
+        readTime: '8 min read',
+        slug: 'finals-week-plan',
+        image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=1000&q=85',
+      },
+    ];
+
+    const scrollToSection = (id) => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    return (
+      <div className="min-h-screen relative overflow-hidden flex flex-col" style={{ background: 'linear-gradient(180deg,#fffafc 0%,#fffdfd 38%,#fbf8ff 100%)', color: '#282432' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 12% 7%,rgba(255,107,157,.09),transparent 24%), radial-gradient(circle at 88% 10%,rgba(174,111,220,.10),transparent 28%)' }} />
+
+        {/* Homepage Navbar */}
+        <header className="relative z-50 sticky top-0 border-b border-pink-100/80 bg-white/90 backdrop-blur-xl">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 min-h-[76px] flex items-center justify-between gap-5">
+            <a href="/" className="flex items-center gap-3 min-w-fit no-underline">
+              <div className="relative flex items-center justify-center">
                 <Coffee className="w-8 h-8 text-pink-500" />
-                <Sparkles className="w-4 h-4 text-purple-400 absolute -top-1 -right-1 animate-pulse" />
+                <Sparkles className="w-4 h-4 text-purple-400 absolute -top-1 -right-1" />
               </div>
               <div>
-                <h1 className="nav-brand text-2xl bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">IdoréStudy ♡</h1>
-                <p className="text-xs tracking-widest font-bold text-pink-400">STUDY WITH YOUR BIAS</p>
+                <div className="nav-brand text-[23px] leading-none bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-500 bg-clip-text text-transparent">IdoréStudy ♡</div>
+                <div className="text-[9px] tracking-[.2em] font-black text-pink-400 mt-1.5">STUDY WITH YOUR BIAS</div>
               </div>
-            </div>
-            <a href="https://www.tiktok.com/@idore.collections" target="_blank" rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '999px', background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)', color: 'white', textDecoration: 'none', fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: '14px', boxShadow: '0 4px 20px rgba(255,107,157,0.4)' }}>
-              <TikTokIcon size={18} color="white" />
-              @idore.collections
             </a>
-          </div>
 
-          <div className="text-center mb-10">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Heart className="w-7 h-7 text-pink-400 animate-pulse" />
-              <Star className="w-7 h-7 text-yellow-400 animate-pulse" style={{ animationDelay: '0.3s' }} />
-              <Sparkles className="w-7 h-7 text-purple-400 animate-pulse" style={{ animationDelay: '0.6s' }} />
-            </div>
-            <h2 className="hero-title text-6xl mb-3 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
-              Who are you studying with today? 💖
-            </h2>
-            <p className="hero-subtitle text-2xl text-gray-500">Pick your bias, grab a latte, and let's ace this together ☕✨</p>
-          </div>
+            <nav className="hidden lg:flex items-center gap-3 text-[13px] font-bold text-slate-600">
+              <button type="button" onClick={() => scrollToSection('study-partners')} className="bg-transparent border-0 px-3 py-2 cursor-pointer font-bold text-slate-600 hover:text-pink-500 transition">Study</button>
+              <button type="button" onClick={() => scrollToSection('focus-rooms')} className="bg-transparent border-0 px-3 py-2 cursor-pointer font-bold text-slate-600 hover:text-pink-500 transition">Focus Rooms</button>
+              <a href="/resources" className="px-3 py-2 no-underline text-slate-600 hover:text-pink-500 transition">Resources</a>
+              <a href="/about" className="px-3 py-2 no-underline text-slate-600 hover:text-pink-500 transition">About</a>
 
-          <div className="flex items-center justify-center gap-3 mb-12 flex-wrap">
-            {groups.map(group => (
-              <button key={group} onClick={() => setSelectedCategory(group)}
-                className={`px-6 py-3 rounded-full font-bold transition-all shadow-lg transform hover:scale-110 ${selectedCategory === group ? 'text-white shadow-2xl scale-110' : 'bg-white border-2 border-pink-200 hover:bg-pink-50 text-gray-700'}`}
-                style={selectedCategory === group ? { background: 'linear-gradient(135deg, #FF6B9D 0%, #C86DD7 100%)' } : {}}>
-                {group === 'All' ? '✨ All' : group}
-              </button>
-            ))}
-          </div>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setHomeMoreOpen(open => !open)}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border-0 cursor-pointer font-bold transition ${homeMoreOpen ? 'text-pink-500 bg-pink-50' : 'bg-transparent text-slate-600 hover:text-pink-500 hover:bg-pink-50'}`}
+                  aria-expanded={homeMoreOpen}
+                  aria-haspopup="menu"
+                >
+                  More
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${homeMoreOpen ? 'rotate-180' : ''}`} />
+                </button>
 
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <Users className="w-6 h-6 text-pink-500" />
-              <h3 className="text-2xl font-black bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Choose Your Study Partner</h3>
-              <Heart className="w-5 h-5 text-pink-400 animate-pulse" />
-            </div>
-            <div className="grid grid-cols-4 gap-6">
-              {filteredBuddies.map(b => (
-                <div key={b.id} onClick={() => setSelectedBuddy(b)}
-                  className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all cursor-pointer transform hover:scale-105 hover:-translate-y-2 group relative border-2 border-pink-100 hover:border-pink-300">
-                  <div className="relative">
-                    <img src={b.image} alt={b.name} className="w-full h-56 object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform">
-                      <div className="flex items-center gap-2"><Heart className="w-4 h-4 text-pink-400" /><span className="text-white text-xs font-bold">Click to study together!</span></div>
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <div className="flex items-start justify-between">
+                {homeMoreOpen && (
+                  <div role="menu" className="absolute right-0 top-[calc(100%+10px)] w-[240px] bg-white border border-pink-100 rounded-2xl p-2 shadow-[0_18px_55px_rgba(74,43,65,.14)]">
+                    <a href="/contact" onClick={() => setHomeMoreOpen(false)} className="group flex items-start gap-3 px-3 py-3 rounded-xl no-underline hover:bg-pink-50 transition">
+                      <div className="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center text-pink-500 flex-shrink-0">✉</div>
                       <div>
-                        <h3 className="font-black text-lg text-gray-800 mb-1">{b.name}</h3>
-                        <p className="text-xs font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">{b.group}</p>
+                        <div className="text-[13px] font-bold text-slate-800 group-hover:text-pink-600">Contact</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5 font-medium">Questions, feedback & requests</div>
                       </div>
-                      <Heart className="w-5 h-5 text-pink-300 group-hover:text-pink-500 group-hover:fill-pink-500 transition" />
-                    </div>
+                    </a>
+
+                    <div className="h-px bg-slate-100 my-1 mx-2" />
+
+                    <a href="/privacy" onClick={() => setHomeMoreOpen(false)} className="group flex items-start gap-3 px-3 py-3 rounded-xl no-underline hover:bg-pink-50 transition">
+                      <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 flex-shrink-0">♡</div>
+                      <div>
+                        <div className="text-[13px] font-bold text-slate-800 group-hover:text-pink-600">Privacy Policy</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5 font-medium">How information is handled</div>
+                      </div>
+                    </a>
+
+                    <a href="/terms" onClick={() => setHomeMoreOpen(false)} className="group flex items-start gap-3 px-3 py-3 rounded-xl no-underline hover:bg-pink-50 transition">
+                      <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 flex-shrink-0">⌑</div>
+                      <div>
+                        <div className="text-[13px] font-bold text-slate-800 group-hover:text-pink-600">Terms of Service</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5 font-medium">Terms for using IdoréStudy</div>
+                      </div>
+                    </a>
+                  </div>
+                )}
+              </div>
+            </nav>
+
+            <button type="button" onClick={() => scrollToSection('study-partners')} className="hidden md:flex items-center gap-2 px-5 py-3 rounded-full text-white font-black text-sm shadow-lg transition hover:scale-[1.025]" style={{ background: 'linear-gradient(135deg,#f85e98 0%,#c264d2 100%)' }}>
+              Start Studying <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="lg:hidden border-t border-pink-50 px-5 py-3">
+            <div className="flex items-center gap-5 overflow-x-auto min-w-0 text-xs font-bold">
+              <button type="button" onClick={() => scrollToSection('study-partners')} className="border-0 bg-transparent p-0 font-bold text-slate-600 whitespace-nowrap">Study</button>
+              <button type="button" onClick={() => scrollToSection('focus-rooms')} className="border-0 bg-transparent p-0 font-bold text-slate-600 whitespace-nowrap">Focus Rooms</button>
+              <a href="/resources" className="no-underline text-slate-600 whitespace-nowrap">Resources</a>
+              <a href="/about" className="no-underline text-slate-600 whitespace-nowrap">About</a>
+              <button type="button" onClick={() => setHomeMoreOpen(open => !open)} className="border-0 bg-transparent p-0 font-bold text-slate-600 flex items-center gap-1 whitespace-nowrap">
+                More
+                <ChevronDown className={`w-3 h-3 transition-transform ${homeMoreOpen ? 'rotate-180' : ''}`} />
+              </button>
+            </div>
+
+            {homeMoreOpen && (
+              <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-pink-100">
+                <a href="/contact" className="px-3 py-2.5 rounded-xl bg-white border border-pink-100 text-center no-underline text-[11px] font-bold text-slate-600">Contact</a>
+                <a href="/privacy" className="px-3 py-2.5 rounded-xl bg-white border border-pink-100 text-center no-underline text-[11px] font-bold text-slate-600">Privacy</a>
+                <a href="/terms" className="px-3 py-2.5 rounded-xl bg-white border border-pink-100 text-center no-underline text-[11px] font-bold text-slate-600">Terms</a>
+              </div>
+            )}
+          </div>
+        </header>
+
+        <main className="relative z-10 flex-1">
+          {/* Hero */}
+          <section className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-10 lg:pt-14 pb-8">
+            <div className="grid lg:grid-cols-[1.02fr_.98fr] items-stretch rounded-[34px] overflow-hidden border border-pink-100 bg-white shadow-[0_25px_80px_rgba(104,68,100,.10)]">
+              <div className="p-8 sm:p-10 lg:p-14 flex flex-col justify-center">
+                <p className="text-[10px] sm:text-[11px] tracking-[.28em] font-black text-amber-500 mb-5">STUDY + FOCUS + BE YOUR BEST</p>
+                <h1 className="hero-title text-[46px] sm:text-6xl lg:text-[68px] leading-[.99] mb-6 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text text-transparent">Study with your bias.<br />Stay focused. ♡</h1>
+                <p className="text-[16px] sm:text-lg text-slate-500 max-w-xl leading-relaxed mb-8">Pomodoro timers, study partners, ambient rooms, playlists, and practical study guides — all in one cozy place.</p>
+
+                <div className="flex flex-wrap gap-3 mb-9">
+                  <button type="button" onClick={() => scrollToSection('study-partners')} className="px-7 py-4 rounded-full text-white font-black shadow-lg transition hover:-translate-y-0.5 flex items-center gap-2" style={{ background: 'linear-gradient(135deg,#f95f99,#a75de8)' }}><Play className="w-4 h-4 fill-white" />Start a Focus Session</button>
+                  <button type="button" onClick={() => scrollToSection('study-partners')} className="px-7 py-4 rounded-full bg-white border border-pink-200 font-black text-slate-800 hover:border-pink-400 transition flex items-center gap-2">Choose Your Bias <Heart className="w-4 h-4 text-pink-500" /></button>
+                </div>
+
+                <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 text-xs font-semibold text-slate-500">
+                  <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-pink-500" />Pomodoro timer</div>
+                  <div className="flex items-center gap-2"><Headphones className="w-4 h-4 text-purple-500" />Study playlists</div>
+                  <div className="flex items-center gap-2"><Users className="w-4 h-4 text-pink-500" />Study partners</div>
+                  <div className="flex items-center gap-2"><Heart className="w-4 h-4 text-purple-500" />Cozy focus</div>
+                </div>
+              </div>
+
+              <div className="relative min-h-[430px] lg:min-h-[520px] overflow-hidden bg-pink-50">
+                <img src={studyBuddies[1]?.image || studyBuddies[0]?.image} alt="Featured study partner" className="absolute inset-0 w-full h-full object-cover object-top" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#493747]/20 via-transparent to-white/5" />
+                <div className="absolute top-7 left-7 bg-white/90 backdrop-blur-xl p-3 rounded-2xl shadow-xl rotate-[-3deg] border border-white">
+                  <div className="flex gap-2">
+                    <div className="w-11 h-14 rounded-xl overflow-hidden border-2 border-white shadow-sm"><img src={studyBuddies[0]?.image} alt="" className="w-full h-full object-cover" /></div>
+                    <div className="w-11 h-14 rounded-xl overflow-hidden border-2 border-white shadow-sm"><img src={studyBuddies[4]?.image} alt="" className="w-full h-full object-cover" /></div>
                   </div>
                 </div>
+                <div className="absolute right-7 bottom-9 bg-[#fff4db] px-5 py-4 shadow-xl rotate-[2deg] max-w-[160px] text-center"><p className="font-serif italic text-[15px] leading-snug text-slate-600">one task at a time ♡</p></div>
+                <Heart className="absolute top-10 right-10 w-9 h-9 text-pink-300" />
+                <Sparkles className="absolute bottom-16 left-14 w-7 h-7 text-amber-300" />
+              </div>
+            </div>
+          </section>
+
+          <section className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-3">
+            <div className="h-20 rounded-2xl border border-slate-200 bg-white/65 flex items-center justify-center text-[10px] uppercase tracking-[.15em] text-slate-400">Advertisement</div>
+          </section>
+
+          {/* Study Partners */}
+          <section id="study-partners" className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-12 pb-16 scroll-mt-32">
+            <div className="flex items-end justify-between gap-5 mb-6">
+              <div>
+                <div className="flex items-center gap-3"><Users className="w-6 h-6 text-pink-500" /><h2 className="hero-title text-3xl sm:text-[34px] bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Choose Your Study Partner ♡</h2></div>
+                <p className="text-sm text-slate-500 mt-2 ml-9">Pick someone, press play, and get started.</p>
+              </div>
+              <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-400">{filteredBuddies.length} available</div>
+            </div>
+
+            <div className="flex gap-2.5 flex-wrap mb-7">
+              {groups.map(group => (
+                <button key={group} type="button" onClick={() => setSelectedCategory(group)} className={`px-4 py-2 rounded-full text-xs font-black transition ${selectedCategory === group ? 'text-white shadow-md' : 'bg-white border border-pink-100 text-slate-600 hover:border-pink-300'}`} style={selectedCategory === group ? { background: 'linear-gradient(135deg,#f95f99,#c76ad6)' } : {}}>{group === 'All' ? 'All' : group}</button>
               ))}
             </div>
-          </div>
-        </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+              {filteredBuddies.map(buddy => (
+                <button key={buddy.id} type="button" onClick={() => { trackEvent('study_partner_selected', { idol: buddy.name, group: buddy.group }); setSelectedBuddy(buddy); }} className="text-left bg-white rounded-[18px] overflow-hidden border border-pink-100 shadow-[0_10px_28px_rgba(86,50,90,.07)] hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(255,107,157,.16)] hover:border-pink-300 transition group">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-pink-50">
+                    <img src={buddy.image} alt={buddy.name} className="w-full h-full object-cover group-hover:scale-[1.035] transition-transform duration-500" />
+                    <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/20 to-transparent" />
+                    <div className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center shadow-sm"><Heart className="w-4 h-4 text-pink-500" /></div>
+                  </div>
+                  <div className="p-4"><div className="font-black text-sm text-slate-900 leading-tight">{buddy.name}</div><div className="text-[10px] font-black text-pink-500 mt-1 uppercase tracking-[.08em]">{buddy.group}</div></div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Study Better */}
+          <section id="study-guides" className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-16">
+            <div className="flex items-end justify-between gap-5 mb-6">
+              <div>
+                <div className="flex items-center gap-3"><Award className="w-6 h-6 text-pink-500" /><h2 className="hero-title text-3xl sm:text-[34px] bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Study Better ✨</h2></div>
+                <p className="text-sm text-slate-500 mt-2 ml-9">Useful reads for when you actually need to get something done.</p>
+              </div>
+              <a href="/resources" className="hidden sm:flex items-center gap-1 text-sm font-bold text-purple-500 hover:text-pink-500 transition no-underline">View all resources <ChevronRight className="w-4 h-4" /></a>
+            </div>
+
+            <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-5">
+              {homeGuides.map(guide => (
+                <a key={guide.slug} href={`/resources/${guide.slug}`} className="group bg-white rounded-[20px] overflow-hidden border border-pink-100 shadow-[0_10px_30px_rgba(70,40,90,.07)] hover:-translate-y-1 hover:border-pink-200 hover:shadow-[0_18px_42px_rgba(70,40,90,.12)] transition-all no-underline text-inherit">
+                  <div className="h-[185px] overflow-hidden bg-slate-100"><img src={guide.image} alt="" className="w-full h-full object-cover group-hover:scale-[1.035] transition-transform duration-500" /></div>
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-3"><span className="text-[10px] uppercase tracking-[.1em] font-black text-pink-500">{guide.category}</span><span className="text-slate-300 text-[9px]">•</span><span className="text-[10px] font-semibold text-slate-400">{guide.readTime}</span></div>
+                    <h3 className="text-[15px] font-black leading-snug text-slate-900">{guide.title}</h3>
+                    <p className="text-xs text-slate-500 mt-2 leading-relaxed line-clamp-3">{guide.description}</p>
+                    <div className="mt-4 flex items-center gap-1 text-[11px] font-black text-pink-500">Read guide <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" /></div>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            <a href="/resources" className="sm:hidden mt-5 inline-flex items-center gap-1 text-sm font-bold text-purple-500 no-underline">View all resources <ChevronRight className="w-4 h-4" /></a>
+          </section>
+
+          <section className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-12">
+            <div className="h-24 rounded-2xl border border-slate-200 bg-white/65 flex items-center justify-center text-[10px] uppercase tracking-[.15em] text-slate-400">Advertisement</div>
+          </section>
+        </main>
 
         <Footer />
       </div>
@@ -1170,6 +1334,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<StudyCafe />} />
             <Route path="/resources" element={<Resources />} />
+            <Route path="/resources/:slug" element={<Resources />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />

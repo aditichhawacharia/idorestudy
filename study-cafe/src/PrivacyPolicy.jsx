@@ -1,225 +1,575 @@
 import React from 'react';
-import { Shield, Heart, Sparkles } from 'lucide-react';
+import {
+  ArrowUpRight,
+  ShieldCheck,
+  ExternalLink,
+  Mail,
+} from 'lucide-react';
 
-const fontStyle = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
+const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .privacy-page {
+    min-height: 100vh;
+    background: #fffdfd;
+    color: #29252b;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .privacy-wrap {
+    width: min(1120px, calc(100% - 48px));
+    margin: 0 auto;
+  }
+
+  .privacy-serif {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .privacy-layout {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 720px);
+    gap: 80px;
+    align-items: start;
+  }
+
+  .privacy-toc {
+    position: sticky;
+    top: 110px;
+  }
+
+  .privacy-toc a {
+    display: block;
+    padding: 7px 0;
+    color: #918990;
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 1.45;
+    transition: color 150ms ease;
+  }
+
+  .privacy-toc a:hover {
+    color: #bc5786;
+  }
+
+  .privacy-section {
+    padding: 0 0 42px;
+    margin-bottom: 42px;
+    border-bottom: 1px solid #eee7eb;
+  }
+
+  .privacy-section:last-child {
+    border-bottom: 0;
+  }
+
+  .privacy-section h2 {
+    margin: 0 0 16px;
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #282329;
+  }
+
+  .privacy-section p,
+  .privacy-section li {
+    font-size: 14px;
+    line-height: 1.82;
+    color: #6e686f;
+  }
+
+  .privacy-section p {
+    margin: 0 0 14px;
+  }
+
+  .privacy-section ul {
+    margin: 12px 0 18px;
+    padding-left: 20px;
+  }
+
+  .privacy-section li {
+    padding-left: 4px;
+    margin-bottom: 7px;
+  }
+
+  .privacy-section strong {
+    color: #3d373e;
+    font-weight: 600;
+  }
+
+  .privacy-link {
+    color: #b95383;
+    text-decoration: underline;
+    text-decoration-color: #e5bfd1;
+    text-underline-offset: 3px;
+  }
+
+  .privacy-link:hover {
+    color: #95406a;
+  }
+
+  .privacy-note {
+    margin: 22px 0 4px;
+    padding: 17px 18px;
+    border-left: 3px solid #d783aa;
+    background: #fdf6f9;
+  }
+
+  @media (max-width: 820px) {
+    .privacy-layout {
+      grid-template-columns: 1fr;
+      gap: 42px;
+    }
+
+    .privacy-toc {
+      position: static;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2px 20px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid #eee7eb;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .privacy-wrap {
+      width: min(100% - 32px, 1120px);
+    }
+
+    .privacy-toc {
+      grid-template-columns: 1fr;
+    }
+
+    .privacy-title {
+      font-size: 44px !important;
+    }
+  }
 `;
 
-const SectionTitle = ({ children }) => (
-  <h2 style={{
-    fontFamily: "'Playfair Display', serif",
-    fontWeight: 900,
-    fontSize: '22px',
-    background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    marginBottom: '14px',
-    marginTop: '40px',
-  }}>{children}</h2>
-);
-
-const Body = ({ children }) => (
-  <p style={{
-    fontFamily: "'Cormorant Garamond', serif",
-    fontSize: '16px',
-    color: '#555',
-    lineHeight: 1.9,
-    marginBottom: '14px',
-  }}>{children}</p>
-);
-
-const Ul = ({ items }) => (
-  <ul style={{ marginBottom: '14px', paddingLeft: '0', listStyle: 'none' }}>
-    {items.map((item, i) => (
-      <li key={i} style={{
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: '16px',
-        color: '#555',
-        lineHeight: 1.9,
-        display: 'flex',
-        gap: '10px',
-        marginBottom: '6px',
-      }}>
-        <span style={{ color: '#FF6B9D', flexShrink: 0 }}>♡</span>
-        {item}
-      </li>
-    ))}
-  </ul>
-);
+const sections = [
+  ['information', 'Information we collect'],
+  ['cookies', 'Cookies and tracking'],
+  ['ads', 'Advertising'],
+  ['third-parties', 'Third-party services'],
+  ['use', 'How we use information'],
+  ['sharing', 'Sharing and disclosure'],
+  ['storage', 'Local storage and retention'],
+  ['children', "Children's privacy"],
+  ['rights', 'Your privacy rights'],
+  ['international', 'International visitors'],
+  ['changes', 'Changes to this policy'],
+  ['contact', 'Contact'],
+];
 
 export default function PrivacyPolicy() {
   const lastUpdated = 'July 13, 2026';
 
   return (
     <>
-      <style>{fontStyle}</style>
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #FFF5F7 0%, #FFF9FB 25%, #F5F3FF 50%, #FFF0F5 75%, #FFF5F7 100%)',
-        paddingBottom: '80px',
-      }}>
-        {/* Hero */}
-        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '72px 32px 40px', textAlign: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
-            <Shield style={{ width: 32, height: 32, color: '#FF6B9D' }} />
-            <Heart style={{ width: 28, height: 28, color: '#C86DD7' }} />
-            <Sparkles style={{ width: 28, height: 28, color: '#9B7EDB' }} />
+      <style>{styles}</style>
+
+      <main className="privacy-page">
+        {/* Header */}
+        <section
+          style={{
+            padding: '88px 0 66px',
+            borderBottom: '1px solid #eee7eb',
+          }}
+        >
+          <div className="privacy-wrap">
+            <div style={{ maxWidth: 760 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 18,
+                  color: '#b95b87',
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
+                <ShieldCheck size={16} strokeWidth={1.8} />
+                Privacy
+              </div>
+
+              <h1
+                className="privacy-serif privacy-title"
+                style={{
+                  margin: '0 0 18px',
+                  fontSize: 'clamp(48px, 6vw, 68px)',
+                  lineHeight: 1.05,
+                  letterSpacing: '-0.04em',
+                  fontWeight: 600,
+                }}
+              >
+                Privacy Policy
+              </h1>
+
+              <p
+                style={{
+                  margin: '0 0 12px',
+                  maxWidth: 650,
+                  fontSize: 15,
+                  lineHeight: 1.75,
+                  color: '#777078',
+                }}
+              >
+                This page explains what information IdoréStudy may collect,
+                why it is used, and the choices available to you when using
+                the site.
+              </p>
+
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 12,
+                  color: '#aaa2a8',
+                }}
+              >
+                Last updated {lastUpdated}
+              </p>
+            </div>
           </div>
-          <h1 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontWeight: 900,
-            fontSize: 'clamp(32px, 5vw, 50px)',
-            lineHeight: 1.1,
-            background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginBottom: '14px',
-          }}>
-            Privacy Policy ✨
-          </h1>
-          <p style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontStyle: 'italic',
-            fontSize: '17px',
-            color: '#B8A0CC',
-          }}>
-            Last updated: {lastUpdated}
-          </p>
-        </div>
+        </section>
 
-        {/* Content */}
-        <div style={{
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '0 32px',
-          background: 'white',
-          borderRadius: '32px',
-          border: '3px solid #FFD7E5',
-          boxShadow: '0 16px 64px rgba(255,107,157,0.10)',
-          padding: '48px',
-        }}>
+        {/* Document */}
+        <section style={{ padding: '66px 0 100px' }}>
+          <div className="privacy-wrap privacy-layout">
+            {/* Contents */}
+            <aside className="privacy-toc">
+              <div
+                style={{
+                  marginBottom: 14,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '.13em',
+                  textTransform: 'uppercase',
+                  color: '#aaa1a7',
+                }}
+              >
+                On this page
+              </div>
 
-          <Body>
-            Welcome to IdoréStudy ("we," "us," or "our"). This Privacy Policy explains how we collect, use, and share information when you use our website located at idorestudy.com (the "Site"). By using the Site, you agree to the practices described in this policy.
-          </Body>
+              {sections.map(([id, label], index) => (
+                <a href={`#${id}`} key={id}>
+                  {index + 1}. {label}
+                </a>
+              ))}
+            </aside>
 
-          <SectionTitle>1. Information We Collect</SectionTitle>
-          <Body>We may collect the following types of information:</Body>
-          <Ul items={[
-            'Usage Data: Pages visited, time spent on the site, browser type, device information, and IP address, collected automatically via cookies and analytics tools.',
-            'Preferences: Timer settings and to-do list items saved locally in your browser\'s localStorage — this data stays on your device and is never sent to our servers.',
-            'Communications: If you contact us via email, we receive the information you provide (name, email address, message content).',
-          ]} />
+            {/* Main copy */}
+            <article>
+              <div
+                style={{
+                  paddingBottom: 42,
+                  marginBottom: 42,
+                  borderBottom: '1px solid #eee7eb',
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 15,
+                    lineHeight: 1.85,
+                    color: '#625c63',
+                  }}
+                >
+                  IdoréStudy (“we,” “us,” or “our”) operates this website.
+                  This Privacy Policy describes how information may be
+                  collected and used when you visit or interact with
+                  IdoréStudy.
+                </p>
+              </div>
 
-          <SectionTitle>2. Cookies and Tracking Technologies</SectionTitle>
-          <Body>
-            We use cookies and similar tracking technologies to operate and improve the Site. Cookies are small text files stored on your device that help us recognize your browser on return visits.
-          </Body>
-          <Body>We use cookies for:</Body>
-          <Ul items={[
-            'Analytics: Understanding how visitors use our site (e.g., Google Analytics).',
-            'Advertising: Serving relevant ads through Google AdSense and other third-party advertising partners.',
-            'Preferences: Remembering your settings across sessions.',
-          ]} />
-          <Body>
-            You can control or disable cookies through your browser settings. Disabling cookies may affect some site functionality.
-          </Body>
+              <section id="information" className="privacy-section">
+                <h2>1. Information we collect</h2>
 
-          <SectionTitle>3. Google AdSense and Third-Party Advertising</SectionTitle>
-          <Body>
-            We use Google AdSense to display advertisements on our Site. Google AdSense uses cookies to show ads based on your prior visits to our site and other sites on the internet. Google's use of advertising cookies enables it and its partners to serve ads based on your visit to our site and/or other sites on the Internet.
-          </Body>
-          <Body>
-            You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style={{ color: '#FF6B9D' }}>Google Ads Settings</a> or by visiting <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" style={{ color: '#FF6B9D' }}>aboutads.info</a>.
-          </Body>
-          <Body>
-            Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to our website or other websites. These third-party ad servers or ad networks use technology to send advertisements and links that appear on IdoréStudy directly to your browser. They automatically receive your IP address when this occurs.
-          </Body>
+                <p>
+                  The information collected depends on how you use the site.
+                  This may include:
+                </p>
 
-          <SectionTitle>4. Third-Party Services</SectionTitle>
-          <Body>Our Site embeds content and services from third parties, including:</Body>
-          <Ul items={[
-            'YouTube (Google LLC): We embed YouTube videos as study backgrounds and music players. YouTube may set cookies and collect data in accordance with Google\'s Privacy Policy.',
-            'Google Analytics: We use Google Analytics to understand how users interact with our Site. Google Analytics collects anonymous data about your visits.',
-            'Google Fonts: We use Google Fonts to display custom typography. Google may collect IP address and request data.',
-          ]} />
-          <Body>
-            All videos displayed on IdoréStudy are embedded from YouTube and other third-party platforms. We do not host, claim ownership of, or redistribute any copyrighted content. All artist names, group names, and related imagery remain the property of their respective owners and labels.
-          </Body>
+                <ul>
+                  <li>
+                    <strong>Usage information.</strong> Information such as
+                    pages viewed, approximate session duration, device type,
+                    browser type, and similar technical information may be
+                    collected through analytics tools.
+                  </li>
 
-          <SectionTitle>5. How We Use Your Information</SectionTitle>
-          <Ul items={[
-            'To operate and improve the Site.',
-            'To analyze usage and understand how users interact with our features.',
-            'To display relevant advertisements.',
-            'To respond to your communications and support requests.',
-            'To comply with legal obligations.',
-          ]} />
+                  <li>
+                    <strong>Local preferences.</strong> Some features,
+                    including timer settings and to-do items, may be stored
+                    directly in your browser using local storage.
+                  </li>
 
-          <SectionTitle>6. Data Sharing and Disclosure</SectionTitle>
-          <Body>We do not sell your personal information. We may share information with:</Body>
-          <Ul items={[
-            'Service providers: Third parties that help us operate the Site (e.g., analytics, advertising).',
-            'Legal authorities: If required by law or to protect our legal rights.',
-            'Business transfers: In connection with a merger, acquisition, or sale of our business.',
-          ]} />
+                  <li>
+                    <strong>Information you send us.</strong> If you contact
+                    IdoréStudy by email, we receive the information contained
+                    in that message, including your email address and any
+                    details you choose to provide.
+                  </li>
+                </ul>
 
-          <SectionTitle>7. Data Retention and Local Storage</SectionTitle>
-          <Body>
-            Timer settings and to-do list items are stored in your browser's localStorage on your device only. This data is not transmitted to our servers and can be cleared at any time by clearing your browser data. We retain server-side analytics data for up to 26 months in accordance with standard analytics practices.
-          </Body>
+                <div className="privacy-note">
+                  <p style={{ margin: 0 }}>
+                    Timer preferences and study to-do items stored through
+                    browser local storage remain on your device unless a
+                    feature explicitly states otherwise.
+                  </p>
+                </div>
+              </section>
 
-          <SectionTitle>8. Children's Privacy</SectionTitle>
-          <Body>
-            Our Site is not directed to children under the age of 13. We do not knowingly collect personal information from children under 13. If you believe a child has provided personal information to us, please contact us and we will delete it promptly.
-          </Body>
+              <section id="cookies" className="privacy-section">
+                <h2>2. Cookies and similar technologies</h2>
 
-          <SectionTitle>9. Your Privacy Rights</SectionTitle>
-          <Body>Depending on your location, you may have the right to:</Body>
-          <Ul items={[
-            'Access the personal data we hold about you.',
-            'Request correction or deletion of your personal data.',
-            'Object to or restrict our processing of your personal data.',
-            'Opt out of personalized advertising.',
-            'Lodge a complaint with a supervisory authority (for EU/EEA residents).',
-          ]} />
-          <Body>
-            To exercise any of these rights, please contact us at idore.collections@gmail.com.
-          </Body>
+                <p>
+                  IdoréStudy may use cookies and similar technologies to keep
+                  the site working, understand how visitors use it, remember
+                  preferences, and support advertising.
+                </p>
 
-          <SectionTitle>10. International Visitors</SectionTitle>
-          <Body>
-            If you are visiting from the European Union, United Kingdom, California, or other regions with privacy regulations, please note that we process your data in accordance with applicable laws. By using our Site, you consent to our collection and use of information as described in this policy.
-          </Body>
+                <p>
+                  Depending on your location and consent choices, these may
+                  include:
+                </p>
 
-          <SectionTitle>11. Changes to This Policy</SectionTitle>
-          <Body>
-            We may update this Privacy Policy from time to time. We will notify you of significant changes by updating the "Last updated" date at the top of this page. Continued use of the Site after changes constitutes acceptance of the updated policy.
-          </Body>
+                <ul>
+                  <li>Essential technologies needed for site functionality.</li>
+                  <li>
+                    Analytics technologies used to understand site traffic and
+                    feature usage.
+                  </li>
+                  <li>
+                    Advertising technologies used by advertising providers.
+                  </li>
+                </ul>
 
-          <SectionTitle>12. Contact Us</SectionTitle>
-          <Body>
-            If you have any questions about this Privacy Policy, please contact us at:
-          </Body>
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(255,107,157,0.06), rgba(200,109,215,0.06))',
-            border: '2px solid #FFD7E5',
-            borderRadius: '16px',
-            padding: '20px 24px',
-            marginTop: '8px',
-          }}>
-            <p style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '15px', color: '#444', marginBottom: '4px' }}>
-              IdoréStudy
-            </p>
-            <a
-              href="mailto:idore.collections@gmail.com"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '16px', color: '#FF6B9D', textDecoration: 'none' }}
-            >
-              idore.collections@gmail.com
-            </a>
+                <p>
+                  You can also control cookies through your browser settings.
+                  Some features may work differently if certain storage is
+                  disabled.
+                </p>
+              </section>
+
+              <section id="ads" className="privacy-section">
+                <h2>3. Advertising</h2>
+
+                <p>
+                  IdoréStudy may display advertising through Google AdSense or
+                  other advertising providers.
+                </p>
+
+                <p>
+                  Advertising providers may use cookies or similar
+                  technologies to measure ad performance and, where permitted,
+                  personalize advertising based on activity across websites or
+                  services.
+                </p>
+
+                <p>
+                  You can learn more about Google's advertising controls at{' '}
+                  <a
+                    className="privacy-link"
+                    href="https://myadcenter.google.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Google My Ad Center
+                  </a>
+                  .
+                </p>
+              </section>
+
+              <section id="third-parties" className="privacy-section">
+                <h2>4. Third-party services</h2>
+
+                <p>
+                  Some parts of IdoréStudy rely on services operated by other
+                  companies. Those services may process information according
+                  to their own privacy policies.
+                </p>
+
+                <ul>
+                  <li>
+                    <strong>YouTube.</strong> Embedded YouTube videos may send
+                    information to Google when video content is loaded or
+                    played.
+                  </li>
+
+                  <li>
+                    <strong>Analytics providers.</strong> Analytics tools may
+                    collect technical and usage information to help us
+                    understand how the site is used.
+                  </li>
+
+                  <li>
+                    <strong>Google Fonts or other hosted assets.</strong> Some
+                    externally hosted resources may receive basic request
+                    information such as IP address and browser data.
+                  </li>
+                </ul>
+
+                <p>
+                  Embedded media remains subject to the terms and privacy
+                  practices of the platform providing that media.
+                </p>
+              </section>
+
+              <section id="use" className="privacy-section">
+                <h2>5. How we use information</h2>
+
+                <p>Information may be used to:</p>
+
+                <ul>
+                  <li>Operate and maintain IdoréStudy.</li>
+                  <li>Understand how visitors use the site.</li>
+                  <li>Improve study tools, layouts, and site performance.</li>
+                  <li>Respond to questions, reports, or support requests.</li>
+                  <li>Display and measure advertising.</li>
+                  <li>Protect the site from abuse or security issues.</li>
+                  <li>Comply with applicable legal obligations.</li>
+                </ul>
+              </section>
+
+              <section id="sharing" className="privacy-section">
+                <h2>6. Sharing and disclosure</h2>
+
+                <p>
+                  We do not sell personal information in exchange for money.
+                  Information may be shared with service providers when
+                  necessary to operate the site, provide analytics, display
+                  advertising, or comply with legal requirements.
+                </p>
+
+                <p>
+                  We may also disclose information if reasonably necessary to
+                  protect IdoréStudy, its users, or our legal rights.
+                </p>
+              </section>
+
+              <section id="storage" className="privacy-section">
+                <h2>7. Local storage and data retention</h2>
+
+                <p>
+                  Some IdoréStudy settings are stored locally in your browser.
+                  You can generally remove this information by clearing site
+                  data or browser storage.
+                </p>
+
+                <p>
+                  Information handled by external analytics or advertising
+                  services may be retained according to those providers'
+                  policies and configuration settings.
+                </p>
+              </section>
+
+              <section id="children" className="privacy-section">
+                <h2>8. Children's privacy</h2>
+
+                <p>
+                  IdoréStudy is not intended to knowingly collect personal
+                  information from children under 13.
+                </p>
+
+                <p>
+                  If you believe a child has provided personal information
+                  directly to us, please contact us so the issue can be
+                  reviewed.
+                </p>
+              </section>
+
+              <section id="rights" className="privacy-section">
+                <h2>9. Your privacy choices and rights</h2>
+
+                <p>
+                  Depending on where you live, you may have rights relating to
+                  your personal information, including the ability to request
+                  access, correction, deletion, or information about certain
+                  processing activities.
+                </p>
+
+                <p>
+                  You may also be able to limit personalized advertising
+                  through your cookie choices, browser settings, or the
+                  controls offered by advertising providers.
+                </p>
+
+                <p>
+                  To make a privacy-related request, contact us at the email
+                  address listed below.
+                </p>
+              </section>
+
+              <section id="international" className="privacy-section">
+                <h2>10. International visitors</h2>
+
+                <p>
+                  IdoréStudy may be accessed by visitors in different
+                  countries. Third-party providers used by the site may
+                  process information in countries other than the one in which
+                  you live.
+                </p>
+
+                <p>
+                  Where required, applicable privacy rights and consent
+                  requirements will apply based on your location.
+                </p>
+              </section>
+
+              <section id="changes" className="privacy-section">
+                <h2>11. Changes to this policy</h2>
+
+                <p>
+                  This Privacy Policy may change as IdoréStudy evolves or as
+                  the services used by the site change.
+                </p>
+
+                <p>
+                  When updates are made, the “Last updated” date at the top of
+                  this page will be revised.
+                </p>
+              </section>
+
+              <section id="contact" className="privacy-section">
+                <h2>12. Contact</h2>
+
+                <p>
+                  Questions about this Privacy Policy or privacy-related
+                  requests can be sent to:
+                </p>
+
+                <a
+                  href="mailto:idore.collections@gmail.com"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginTop: 6,
+                    color: '#312b31',
+                    textDecoration: 'none',
+                    fontSize: 14,
+                    fontWeight: 600,
+                  }}
+                >
+                  <Mail size={16} strokeWidth={1.8} />
+                  idore.collections@gmail.com
+                  <ArrowUpRight size={14} />
+                </a>
+              </section>
+            </article>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </>
   );
 }

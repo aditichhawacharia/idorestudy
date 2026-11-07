@@ -1,203 +1,577 @@
 import React from 'react';
-import { FileText, Heart, Sparkles } from 'lucide-react';
+import {
+  FileText,
+  Mail,
+  ArrowUpRight,
+} from 'lucide-react';
 
-const fontStyle = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
+const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .terms-page {
+    min-height: 100vh;
+    background: #fffdfd;
+    color: #29252b;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .terms-wrap {
+    width: min(1120px, calc(100% - 48px));
+    margin: 0 auto;
+  }
+
+  .terms-serif {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .terms-layout {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 720px);
+    gap: 80px;
+    align-items: start;
+  }
+
+  .terms-toc {
+    position: sticky;
+    top: 110px;
+  }
+
+  .terms-toc a {
+    display: block;
+    padding: 7px 0;
+    color: #918990;
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 1.45;
+    transition: color 150ms ease;
+  }
+
+  .terms-toc a:hover {
+    color: #bc5786;
+  }
+
+  .terms-section {
+    padding: 0 0 42px;
+    margin-bottom: 42px;
+    border-bottom: 1px solid #eee7eb;
+  }
+
+  .terms-section:last-child {
+    border-bottom: 0;
+  }
+
+  .terms-section h2 {
+    margin: 0 0 16px;
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #282329;
+  }
+
+  .terms-section p,
+  .terms-section li {
+    font-size: 14px;
+    line-height: 1.82;
+    color: #6e686f;
+  }
+
+  .terms-section p {
+    margin: 0 0 14px;
+  }
+
+  .terms-section ul {
+    margin: 12px 0 18px;
+    padding-left: 20px;
+  }
+
+  .terms-section li {
+    padding-left: 4px;
+    margin-bottom: 7px;
+  }
+
+  .terms-section strong {
+    color: #3d373e;
+    font-weight: 600;
+  }
+
+  .terms-link {
+    color: #b95383;
+    text-decoration: underline;
+    text-decoration-color: #e5bfd1;
+    text-underline-offset: 3px;
+  }
+
+  .terms-note {
+    margin: 22px 0 4px;
+    padding: 17px 18px;
+    border-left: 3px solid #d783aa;
+    background: #fdf6f9;
+  }
+
+  @media (max-width: 820px) {
+    .terms-layout {
+      grid-template-columns: 1fr;
+      gap: 42px;
+    }
+
+    .terms-toc {
+      position: static;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2px 20px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid #eee7eb;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .terms-wrap {
+      width: min(100% - 32px, 1120px);
+    }
+
+    .terms-toc {
+      grid-template-columns: 1fr;
+    }
+
+    .terms-title {
+      font-size: 44px !important;
+    }
+  }
 `;
 
-const SectionTitle = ({ children }) => (
-  <h2 style={{
-    fontFamily: "'Playfair Display', serif",
-    fontWeight: 900,
-    fontSize: '22px',
-    background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    marginBottom: '14px',
-    marginTop: '40px',
-  }}>{children}</h2>
-);
-
-const Body = ({ children }) => (
-  <p style={{
-    fontFamily: "'Cormorant Garamond', serif",
-    fontSize: '16px',
-    color: '#555',
-    lineHeight: 1.9,
-    marginBottom: '14px',
-  }}>{children}</p>
-);
-
-const Ul = ({ items }) => (
-  <ul style={{ marginBottom: '14px', paddingLeft: '0', listStyle: 'none' }}>
-    {items.map((item, i) => (
-      <li key={i} style={{
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: '16px',
-        color: '#555',
-        lineHeight: 1.9,
-        display: 'flex',
-        gap: '10px',
-        marginBottom: '6px',
-      }}>
-        <span style={{ color: '#FF6B9D', flexShrink: 0 }}>♡</span>
-        {item}
-      </li>
-    ))}
-  </ul>
-);
+const sections = [
+  ['acceptance', 'Acceptance of terms'],
+  ['service', 'About the service'],
+  ['third-party', 'Third-party content'],
+  ['acceptable-use', 'Acceptable use'],
+  ['advertising', 'Advertising'],
+  ['availability', 'Availability and changes'],
+  ['disclaimer', 'Disclaimer of warranties'],
+  ['liability', 'Limitation of liability'],
+  ['links', 'External links'],
+  ['termination', 'Access and termination'],
+  ['changes', 'Changes to these terms'],
+  ['law', 'Governing law'],
+  ['contact', 'Contact'],
+];
 
 export default function Terms() {
-  const lastUpdated = 'June 2025';
+  const lastUpdated = 'November 6, 2026';
 
   return (
     <>
-      <style>{fontStyle}</style>
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #FFF5F7 0%, #FFF9FB 25%, #F5F3FF 50%, #FFF0F5 75%, #FFF5F7 100%)',
-        paddingBottom: '80px',
-      }}>
-        {/* Hero */}
-        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '72px 32px 40px', textAlign: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '20px' }}>
-            <FileText style={{ width: 32, height: 32, color: '#FF6B9D' }} />
-            <Heart style={{ width: 28, height: 28, color: '#C86DD7' }} />
-            <Sparkles style={{ width: 28, height: 28, color: '#9B7EDB' }} />
+      <style>{styles}</style>
+
+      <main className="terms-page">
+        {/* Header */}
+        <section
+          style={{
+            padding: '88px 0 66px',
+            borderBottom: '1px solid #eee7eb',
+          }}
+        >
+          <div className="terms-wrap">
+            <div style={{ maxWidth: 760 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 18,
+                  color: '#b95b87',
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
+                <FileText size={16} strokeWidth={1.8} />
+                Legal
+              </div>
+
+              <h1
+                className="terms-serif terms-title"
+                style={{
+                  margin: '0 0 18px',
+                  fontSize: 'clamp(48px, 6vw, 68px)',
+                  lineHeight: 1.05,
+                  letterSpacing: '-0.04em',
+                  fontWeight: 600,
+                }}
+              >
+                Terms of Service
+              </h1>
+
+              <p
+                style={{
+                  margin: '0 0 12px',
+                  maxWidth: 650,
+                  fontSize: 15,
+                  lineHeight: 1.75,
+                  color: '#777078',
+                }}
+              >
+                These Terms explain the rules that apply when using
+                IdoréStudy and the study tools, media, and resources available
+                through the site.
+              </p>
+
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 12,
+                  color: '#aaa2a8',
+                }}
+              >
+                Last updated {lastUpdated}
+              </p>
+            </div>
           </div>
-          <h1 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontWeight: 900,
-            fontSize: 'clamp(32px, 5vw, 50px)',
-            lineHeight: 1.1,
-            background: 'linear-gradient(135deg, #FF6B9D, #C86DD7)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginBottom: '14px',
-          }}>
-            Terms of Service ✨
-          </h1>
-          <p style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontStyle: 'italic',
-            fontSize: '17px',
-            color: '#B8A0CC',
-          }}>
-            Last updated: {lastUpdated}
-          </p>
-        </div>
+        </section>
 
-        {/* Content */}
-        <div style={{
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '48px',
-          background: 'white',
-          borderRadius: '32px',
-          border: '3px solid #FFD7E5',
-          boxShadow: '0 16px 64px rgba(255,107,157,0.10)',
-        }}>
+        {/* Document */}
+        <section style={{ padding: '66px 0 100px' }}>
+          <div className="terms-wrap terms-layout">
+            {/* Contents */}
+            <aside className="terms-toc">
+              <div
+                style={{
+                  marginBottom: 14,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '.13em',
+                  textTransform: 'uppercase',
+                  color: '#aaa1a7',
+                }}
+              >
+                On this page
+              </div>
 
-          <Body>
-            Welcome to IdoréStudy! These Terms of Service ("Terms") govern your use of our website at idorestudy.com (the "Site") and all related services. By accessing or using the Site, you agree to be bound by these Terms.
-          </Body>
+              {sections.map(([id, label], index) => (
+                <a href={`#${id}`} key={id}>
+                  {index + 1}. {label}
+                </a>
+              ))}
+            </aside>
 
-          <SectionTitle>1. Acceptance of Terms</SectionTitle>
-          <Body>
-            By using IdoréStudy, you confirm that you are at least 13 years of age, have read and understood these Terms, and agree to be bound by them. If you do not agree to these Terms, please discontinue using the Site.
-          </Body>
+            {/* Main */}
+            <article>
+              <div
+                style={{
+                  paddingBottom: 42,
+                  marginBottom: 42,
+                  borderBottom: '1px solid #eee7eb',
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 15,
+                    lineHeight: 1.85,
+                    color: '#625c63',
+                  }}
+                >
+                  These Terms of Service (“Terms”) govern your access to and
+                  use of IdoréStudy. By using the site, you agree to these
+                  Terms. If you do not agree with them, please do not use the
+                  site.
+                </p>
+              </div>
 
-          <SectionTitle>2. Description of Service</SectionTitle>
-          <Body>
-            IdoréStudy is a free, web-based study companion application that provides virtual study sessions featuring K-pop idol video backgrounds, built-in Pomodoro timers, ambient music from curated YouTube playlists, and productivity tools such as to-do lists.
-          </Body>
-          <Body>The service is provided free of charge and does not require account registration.</Body>
+              <section id="acceptance" className="terms-section">
+                <h2>1. Acceptance of terms</h2>
 
-          <SectionTitle>3. Third-Party Content and Intellectual Property</SectionTitle>
-          <Body>
-            IdoréStudy embeds video and audio content from third-party platforms, primarily YouTube. All embedded videos are streamed directly from their original platforms and subject to those platforms' terms of service.
-          </Body>
-          <Ul items={[
-            'We do not host, store, upload, or claim ownership of any K-pop music, videos, or artist imagery displayed on the Site.',
-            'All artist names, group names, logos, and related imagery are the property of their respective entertainment companies (e.g., HYBE, YG Entertainment, SM Entertainment, JYP Entertainment, Starship Entertainment, and others).',
-            'All music is embedded from YouTube and remains subject to YouTube\'s terms and the applicable content licensing agreements.',
-            'IdoréStudy is a fan-made, non-commercial project with no affiliation with any K-pop artist, group, or entertainment company.',
-          ]} />
+                <p>
+                  By accessing or using IdoréStudy, you confirm that you are
+                  legally permitted to use the site and agree to comply with
+                  these Terms.
+                </p>
 
-          <SectionTitle>4. Acceptable Use</SectionTitle>
-          <Body>You agree not to:</Body>
-          <Ul items={[
-            'Use the Site for any unlawful purpose or in violation of any applicable laws or regulations.',
-            'Attempt to circumvent, disable, or interfere with the Site\'s technical systems or security features.',
-            'Scrape, copy, or redistribute any content from the Site without our prior written permission.',
-            'Use the Site in any way that could damage, overburden, or impair its operation.',
-            'Represent yourself as affiliated with IdoréStudy, its creators, or any K-pop artist or entertainment company.',
-          ]} />
+                <p>
+                  If you are using the site on behalf of another person or
+                  organization, you confirm that you are authorized to accept
+                  these Terms on their behalf.
+                </p>
+              </section>
 
-          <SectionTitle>5. Advertising</SectionTitle>
-          <Body>
-            The Site may display advertisements served by Google AdSense and other third-party advertising networks. These ads are governed by the respective advertiser's terms and policies. We are not responsible for the content of third-party advertisements.
-          </Body>
-          <Body>
-            By using the Site, you acknowledge and consent to the display of advertisements, including personalized advertisements based on cookies and browsing history, as described in our Privacy Policy.
-          </Body>
+              <section id="service" className="terms-section">
+                <h2>2. About the service</h2>
 
-          <SectionTitle>6. Disclaimer of Warranties</SectionTitle>
-          <Body>
-            The Site is provided on an "as is" and "as available" basis without warranties of any kind, either express or implied. We do not warrant that the Site will be uninterrupted, error-free, or free of viruses or other harmful components. We make no warranties regarding the accuracy, reliability, or completeness of any content on the Site.
-          </Body>
-          <Body>
-            Video availability and music playlists depend on third-party platforms (YouTube) and may change without notice. We are not responsible for the unavailability or removal of any embedded content.
-          </Body>
+                <p>
+                  IdoréStudy is a web-based study platform that provides
+                  productivity and focus features including:
+                </p>
 
-          <SectionTitle>7. Limitation of Liability</SectionTitle>
-          <Body>
-            To the fullest extent permitted by law, IdoréStudy and its creators shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use the Site, even if advised of the possibility of such damages.
-          </Body>
+                <ul>
+                  <li>virtual study rooms and study-partner experiences;</li>
+                  <li>focus and break timers;</li>
+                  <li>to-do and task-management tools;</li>
+                  <li>ambient music and study audio;</li>
+                  <li>study guides and educational resources; and</li>
+                  <li>other study-related tools and content.</li>
+                </ul>
 
-          <SectionTitle>8. Indemnification</SectionTitle>
-          <Body>
-            You agree to indemnify and hold harmless IdoréStudy and its creators from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from your use of the Site or your violation of these Terms.
-          </Body>
+                <p>
+                  Some features may be added, changed, or removed over time as
+                  the site develops.
+                </p>
+              </section>
 
-          <SectionTitle>9. Links to Third-Party Sites</SectionTitle>
-          <Body>
-            The Site may contain links to third-party websites, including YouTube, social media platforms, and affiliate links. We are not responsible for the content or privacy practices of those sites. We encourage you to review the terms and privacy policies of any third-party sites you visit.
-          </Body>
+              <section id="third-party" className="terms-section">
+                <h2>3. Third-party content and intellectual property</h2>
 
-          <SectionTitle>10. Changes to Terms</SectionTitle>
-          <Body>
-            We reserve the right to modify these Terms at any time. We will update the "Last updated" date at the top of this page when changes are made. Continued use of the Site after changes are posted constitutes your acceptance of the revised Terms.
-          </Body>
+                <p>
+                  IdoréStudy may display, link to, or embed content provided by
+                  third parties, including video, audio, images, and external
+                  websites.
+                </p>
 
-          <SectionTitle>11. Governing Law</SectionTitle>
-          <Body>
-            These Terms shall be governed by and construed in accordance with applicable law. Any disputes arising from these Terms or your use of the Site shall be resolved through good-faith negotiation, and if unsuccessful, through applicable legal processes.
-          </Body>
+                <ul>
+                  <li>
+                    Third-party media remains owned by its respective owner or
+                    rights holder.
+                  </li>
 
-          <SectionTitle>12. Contact</SectionTitle>
-          <Body>
-            For questions about these Terms, please contact us:
-          </Body>
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(255,107,157,0.06), rgba(200,109,215,0.06))',
-            border: '2px solid #FFD7E5',
-            borderRadius: '16px',
-            padding: '20px 24px',
-            marginTop: '8px',
-          }}>
-            <p style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '15px', color: '#444', marginBottom: '4px' }}>
-              IdoréStudy
-            </p>
-            <a
-              href="mailto:idore.collections@gmail.com"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '16px', color: '#FF6B9D', textDecoration: 'none' }}
-            >
-              idore.collections@gmail.com
-            </a>
+                  <li>
+                    Embedded content may be subject to the terms and policies
+                    of the platform from which it is provided.
+                  </li>
+
+                  <li>
+                    IdoréStudy does not claim ownership of third-party artist
+                    names, group names, trademarks, or media.
+                  </li>
+
+                  <li>
+                    The availability of embedded content may change or end at
+                    any time based on the decisions of the provider or rights
+                    holder.
+                  </li>
+                </ul>
+
+                <div className="terms-note">
+                  <p style={{ margin: 0 }}>
+                    IdoréStudy is an independent fan-created study platform and
+                    is not affiliated with, sponsored by, or endorsed by any
+                    artist, entertainment company, agency, or record label
+                    unless explicitly stated otherwise.
+                  </p>
+                </div>
+              </section>
+
+              <section id="acceptable-use" className="terms-section">
+                <h2>4. Acceptable use</h2>
+
+                <p>You agree not to use IdoréStudy to:</p>
+
+                <ul>
+                  <li>violate any applicable law or regulation;</li>
+                  <li>
+                    attempt to interfere with, disable, damage, or overload the
+                    site or its infrastructure;
+                  </li>
+                  <li>
+                    attempt to access restricted areas, systems, or data
+                    without authorization;
+                  </li>
+                  <li>
+                    use automated systems to scrape or extract substantial
+                    portions of site content without permission;
+                  </li>
+                  <li>
+                    falsely suggest that you are affiliated with IdoréStudy or
+                    its creators;
+                  </li>
+                  <li>
+                    use the site in a way that infringes the rights of others;
+                    or
+                  </li>
+                  <li>
+                    exploit the site for fraudulent, abusive, or malicious
+                    purposes.
+                  </li>
+                </ul>
+              </section>
+
+              <section id="advertising" className="terms-section">
+                <h2>5. Advertising</h2>
+
+                <p>
+                  IdoréStudy may display advertisements from third-party
+                  advertising providers, including Google AdSense.
+                </p>
+
+                <p>
+                  We do not control the content of third-party advertisements
+                  and are not responsible for products, services, claims, or
+                  websites promoted through those advertisements.
+                </p>
+
+                <p>
+                  Advertising and related tracking technologies are described
+                  in more detail in the Privacy Policy.
+                </p>
+              </section>
+
+              <section id="availability" className="terms-section">
+                <h2>6. Availability and changes to the service</h2>
+
+                <p>
+                  We may update, modify, suspend, or discontinue any part of
+                  IdoréStudy at any time.
+                </p>
+
+                <p>
+                  We do not guarantee that every feature, study room, media
+                  item, playlist, or resource will remain permanently
+                  available.
+                </p>
+
+                <p>
+                  Third-party media may also become unavailable for reasons
+                  outside our control.
+                </p>
+              </section>
+
+              <section id="disclaimer" className="terms-section">
+                <h2>7. Disclaimer of warranties</h2>
+
+                <p>
+                  IdoréStudy is provided on an “as is” and “as available”
+                  basis.
+                </p>
+
+                <p>
+                  To the extent permitted by law, we make no warranties,
+                  express or implied, regarding the availability, reliability,
+                  accuracy, security, or suitability of the site or its
+                  content.
+                </p>
+
+                <p>
+                  IdoréStudy is a productivity and study-support tool. It is
+                  not intended to provide professional academic, medical,
+                  financial, or legal advice.
+                </p>
+              </section>
+
+              <section id="liability" className="terms-section">
+                <h2>8. Limitation of liability</h2>
+
+                <p>
+                  To the fullest extent permitted by applicable law,
+                  IdoréStudy and its operators will not be liable for
+                  indirect, incidental, special, consequential, or punitive
+                  damages arising from your use of or inability to use the
+                  site.
+                </p>
+
+                <p>
+                  This includes losses arising from unavailable third-party
+                  content, interruptions, technical errors, data loss, or
+                  interactions with external websites or advertisements.
+                </p>
+              </section>
+
+              <section id="links" className="terms-section">
+                <h2>9. External links and services</h2>
+
+                <p>
+                  IdoréStudy may contain links to third-party websites,
+                  platforms, or services.
+                </p>
+
+                <p>
+                  Those services operate independently from IdoréStudy and may
+                  have their own terms, privacy policies, and practices. We are
+                  not responsible for their content or operation.
+                </p>
+              </section>
+
+              <section id="termination" className="terms-section">
+                <h2>10. Access and termination</h2>
+
+                <p>
+                  We may restrict or block access to the site where reasonably
+                  necessary to protect IdoréStudy, its users, or third parties,
+                  or to address misuse of the service.
+                </p>
+
+                <p>
+                  Because IdoréStudy currently does not require user accounts
+                  for its core study experience, there may not be an account
+                  to terminate or delete.
+                </p>
+              </section>
+
+              <section id="changes" className="terms-section">
+                <h2>11. Changes to these terms</h2>
+
+                <p>
+                  We may update these Terms as the site changes.
+                </p>
+
+                <p>
+                  When material changes are made, the “Last updated” date at
+                  the top of this page will be revised. Your continued use of
+                  the site after updated Terms are posted constitutes
+                  acceptance of the revised Terms where permitted by law.
+                </p>
+              </section>
+
+              <section id="law" className="terms-section">
+                <h2>12. Governing law</h2>
+
+                <p>
+                  These Terms will be interpreted according to applicable law.
+                  Nothing in these Terms limits any consumer rights that cannot
+                  legally be waived.
+                </p>
+
+                <p>
+                  Any dispute relating to IdoréStudy should first be raised
+                  with us so that we have an opportunity to resolve the issue
+                  informally where appropriate.
+                </p>
+              </section>
+
+              <section id="contact" className="terms-section">
+                <h2>13. Contact</h2>
+
+                <p>
+                  If you have questions about these Terms, you can contact:
+                </p>
+
+                <a
+                  href="mailto:idore.collections@gmail.com"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginTop: 6,
+                    color: '#312b31',
+                    textDecoration: 'none',
+                    fontSize: 14,
+                    fontWeight: 600,
+                  }}
+                >
+                  <Mail size={16} strokeWidth={1.8} />
+                  idore.collections@gmail.com
+                  <ArrowUpRight size={14} />
+                </a>
+              </section>
+            </article>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </>
   );
 }
