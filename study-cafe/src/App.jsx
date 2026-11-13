@@ -945,10 +945,6 @@ const StudyCafe = () => {
             </div>
           </section>
 
-          <section className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-3">
-            <div className="h-20 rounded-2xl border border-slate-200 bg-white/65 flex items-center justify-center text-[10px] uppercase tracking-[.15em] text-slate-400">Advertisement</div>
-          </section>
-
           {/* Study Partners */}
           <section id="study-partners" className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-12 pb-16 scroll-mt-32">
             <div className="flex items-end justify-between gap-5 mb-6">
@@ -1006,9 +1002,6 @@ const StudyCafe = () => {
             <a href="/resources" className="sm:hidden mt-5 inline-flex items-center gap-1 text-sm font-bold text-purple-500 no-underline">View all resources <ChevronRight className="w-4 h-4" /></a>
           </section>
 
-          <section className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-12">
-            <div className="h-24 rounded-2xl border border-slate-200 bg-white/65 flex items-center justify-center text-[10px] uppercase tracking-[.15em] text-slate-400">Advertisement</div>
-          </section>
         </main>
 
         <Footer />

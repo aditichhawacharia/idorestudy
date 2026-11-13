@@ -442,7 +442,6 @@ const styles = `
 
 const mainLinks = [
   { to: '/', label: 'Study' },
-  { to: '/focus-rooms', label: 'Focus Rooms' },
   { to: '/resources', label: 'Resources' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
